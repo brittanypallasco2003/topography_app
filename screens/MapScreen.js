@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Button, Alert } from 'react-native';
+import { View, StyleSheet, Button, Alert, ActivityIndicator } from 'react-native';
 import MapView, { Marker, Polygon } from 'react-native-maps';
 import { collection, doc, setDoc, onSnapshot } from "firebase/firestore"; 
 import { db } from '../utils/firebaseConfig';
@@ -12,7 +12,7 @@ const generateRandomUserId = () => {
 
 const calculateAreaTurf = (locations) => {
   const coordinates = locations.map(loc => [loc.coords.longitude, loc.coords.latitude]);
-  coordinates.push(coordinates[0]);
+  coordinates.push(coordinates[0]); 
   const polygon = turf.polygon([coordinates]);
   const area = turf.area(polygon);
   return area;
@@ -22,20 +22,27 @@ const MapScreen = () => {
   const [location, setLocation] = useState(null);
   const [locations, setLocations] = useState([]);
   const [userId, setUserId] = useState(generateRandomUserId);
+  const [region, setRegion] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       try {
         let initialLocation = await getCurrentLocation();
         setLocation(initialLocation);
+        setRegion({
+          latitude: initialLocation.coords.latitude,
+          longitude: initialLocation.coords.longitude,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        });
+        setLoading(false);
 
-        // Enviar la ubicación inicial a Firestore
         await setDoc(doc(db, "locations", userId), {
           coords: initialLocation.coords,
           timestamp: new Date(),
         });
 
-        // Watch the location and update Firestore on location change
         await watchLocation(async (newLocation, distanceThreshold) => {
           if (location) {
             const distance = turf.distance(
@@ -46,6 +53,12 @@ const MapScreen = () => {
 
             if (distance > distanceThreshold) {
               setLocation(newLocation);
+              setRegion({
+                latitude: newLocation.coords.latitude,
+                longitude: newLocation.coords.longitude,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+              });
 
               // Actualizar la ubicación en Firestore
               await setDoc(doc(db, "locations", userId), {
@@ -55,10 +68,17 @@ const MapScreen = () => {
             }
           } else {
             setLocation(newLocation);
+            setRegion({
+              latitude: newLocation.coords.latitude,
+              longitude: newLocation.coords.longitude,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
+            });
           }
         });
       } catch (error) {
         console.error("Error in location setup: ", error);
+        setLoading(false);
       }
     })();
   }, []);
@@ -77,38 +97,52 @@ const MapScreen = () => {
     Alert.alert(`Área del Polígono`, `El área del polígono es ${area.toFixed(2)} metros cuadrados.`);
   };
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      <MapView
-        style={styles.map}
-        initialRegion={{
-          latitude: location ? location.coords.latitude : 0,
-          longitude: location ? location.coords.longitude : 0,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-        }}
-      >
-        {locations.map(loc => (
-          <Marker
-            key={loc.id}
-            coordinate={{
-              latitude: loc.coords.latitude,
-              longitude: loc.coords.longitude,
-            }}
-            title={`User: ${loc.id}`}
-          />
-        ))}
-        {locations.length >= 3 && (
-          <Polygon
-            coordinates={locations.map(loc => ({
-              latitude: loc.coords.latitude,
-              longitude: loc.coords.longitude,
-            }))}
-            fillColor="rgba(0, 200, 0, 0.5)"
-            strokeColor="rgba(0,0,0,0.5)"
-          />
-        )}
-      </MapView>
+      {region && (
+        <MapView
+          style={styles.map}
+          region={region}
+        >
+          {location && (
+            <Marker
+              coordinate={{
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+              }}
+              title="Your Location"
+            />
+          )}
+          {locations.map(loc => (
+            <Marker
+              key={loc.id}
+              coordinate={{
+                latitude: loc.coords.latitude,
+                longitude: loc.coords.longitude,
+              }}
+              title={`User: ${loc.id}`}
+            />
+          ))}
+          {locations.length >= 3 && (
+            <Polygon
+              coordinates={locations.map(loc => ({
+                latitude: loc.coords.latitude,
+                longitude: loc.coords.longitude,
+              }))}
+              fillColor="rgba(0, 200, 0, 0.5)"
+              strokeColor="rgba(0,0,0,0.5)"
+            />
+          )}
+        </MapView>
+      )}
       {locations.length >= 3 && (
         <Button title="Formar Polígono y Calcular Área" onPress={handlePolygonPress} />
       )}
@@ -122,6 +156,11 @@ const styles = StyleSheet.create({
   },
   map: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
