@@ -6,7 +6,7 @@ import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCOdChbSAGxvO-oEfN0hVQ7Hbi2TnfvVfQ",
+  apiKey: process.env.EXPO_PUBLIC_API_KEY,
   authDomain: "proyecto-final-topography.firebaseapp.com",
   projectId: "proyecto-final-topography",
   storageBucket: "proyecto-final-topography.appspot.com",

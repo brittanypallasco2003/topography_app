@@ -7,7 +7,6 @@ const HomeScreen = ({ navigation }) => {
       <Text style={styles.title}>Home</Text>
       <Button title="Go to Map" onPress={() => navigation.navigate('Map')} />
       <Button title="User Management" onPress={() => navigation.navigate('UserManagement')} />
-      <Button title="Terrain Details" onPress={() => navigation.navigate('TerrainDetails')} />
     </View>
   );
 };
