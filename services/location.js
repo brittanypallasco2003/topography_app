@@ -15,7 +15,7 @@ export const getCurrentLocation = async () => {
   }
 };
 
-export const watchLocation = async (callback, distanceThreshold = 10) => {
+export const watchLocation = async (callback, distanceThreshold = 1) => {
   try {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {

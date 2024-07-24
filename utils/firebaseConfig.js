@@ -7,11 +7,11 @@ import { getFirestore } from "firebase/firestore";
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_API_KEY,
-  authDomain: "proyecto-final-topography.firebaseapp.com",
-  projectId: "proyecto-final-topography",
-  storageBucket: "proyecto-final-topography.appspot.com",
-  messagingSenderId: "60472989572",
-  appId: "1:60472989572:web:961d05e4635ea946a26fd1",
+  authDomain: process.env.EXPO_PUBLIC_AUTH_DOMAIN,
+  projectId: process.env.EXPO_PUBLIC_ID_PROYECT,
+  storageBucket: process.env.EXPO_PUBLIC_STORAGE_BUCKET,
+  messagingSenderId: process.env.EXPO_PUBLIC_MESSAGING_SENDER_ID,
+  appId: process.env.EXPO_PUBLIC_APP_ID,
 };
 
 // Initialize Firebase

@@ -12,7 +12,7 @@ const generateRandomUserId = () => {
 
 const calculateAreaTurf = (locations) => {
   const coordinates = locations.map(loc => [loc.coords.longitude, loc.coords.latitude]);
-  coordinates.push(coordinates[0]); 
+  coordinates.push(coordinates[0]); // Ensure the polygon is closed
   const polygon = turf.polygon([coordinates]);
   const area = turf.area(polygon);
   return area;
@@ -29,13 +29,13 @@ const MapScreen = () => {
         let initialLocation = await getCurrentLocation();
         setLocation(initialLocation);
 
-        
+        // Enviar la ubicación inicial a Firestore
         await setDoc(doc(db, "locations", userId), {
           coords: initialLocation.coords,
           timestamp: new Date(),
         });
 
-        
+        // Watch the location and update Firestore on location change
         await watchLocation(async (newLocation, distanceThreshold) => {
           if (location) {
             const distance = turf.distance(
@@ -88,15 +88,6 @@ const MapScreen = () => {
           longitudeDelta: 0.0421,
         }}
       >
-        {location && (
-          <Marker
-            coordinate={{
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-            }}
-            title="Your Location"
-          />
-        )}
         {locations.map(loc => (
           <Marker
             key={loc.id}
