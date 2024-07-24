@@ -12,7 +12,7 @@ const generateRandomUserId = () => {
 
 const calculateAreaTurf = (locations) => {
   const coordinates = locations.map(loc => [loc.coords.longitude, loc.coords.latitude]);
-  coordinates.push(coordinates[0]); // Ensure the polygon is closed
+  coordinates.push(coordinates[0]);
   const polygon = turf.polygon([coordinates]);
   const area = turf.area(polygon);
   return area;

@@ -15,7 +15,7 @@ export const getCurrentLocation = async () => {
   }
 };
 
-export const watchLocation = async (callback, distanceThreshold = 1) => {
+export const watchLocation = async (callback, distanceThreshold = 5) => {
   try {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
@@ -25,8 +25,8 @@ export const watchLocation = async (callback, distanceThreshold = 1) => {
     return await Location.watchPositionAsync(
       {
         accuracy: Location.Accuracy.High,
-        timeInterval: 1000, // Update every second
-        distanceInterval: 1, // Update every meter
+        timeInterval: 5000, 
+        distanceInterval: 5, 
       },
       (newLocation) => {
         callback(newLocation, distanceThreshold);
