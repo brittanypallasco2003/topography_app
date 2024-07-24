@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Button, Alert, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Button, Alert, ActivityIndicator, Text } from 'react-native';
 import MapView, { Marker, Polygon } from 'react-native-maps';
 import { collection, doc, setDoc, onSnapshot } from "firebase/firestore"; 
-import { db } from '../utils/firebaseConfig';
+import { db, auth } from '../utils/firebaseConfig';
 import * as turf from '@turf/turf';
 import { getCurrentLocation, watchLocation } from '../services/location';
 
-const generateRandomUserId = () => {
-  return Math.floor(Math.random() * 1000000).toString();
+const UserId = () => {
+  const user = auth.currentUser;
+  if (user && user.uid) {
+    return user.uid;
+  } else {
+    Alert.alert('No user logged in');
+    return;
+  }
 };
 
 const calculateAreaTurf = (locations) => {
@@ -21,11 +27,18 @@ const calculateAreaTurf = (locations) => {
 const MapScreen = () => {
   const [location, setLocation] = useState(null);
   const [locations, setLocations] = useState([]);
-  const [userId, setUserId] = useState(generateRandomUserId);
+  const [userId, setUserId] = useState(UserId);
   const [region, setRegion] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const user = auth.currentUser;
+    if (user) {
+      setUserId(user.uid); // Usa el ID del usuario autenticado
+    } else {
+      Alert.alert('No user logged in');
+      return;
+    }
     (async () => {
       try {
         let initialLocation = await getCurrentLocation();
@@ -146,6 +159,9 @@ const MapScreen = () => {
       {locations.length >= 3 && (
         <Button title="Formar Polígono y Calcular Área" onPress={handlePolygonPress} />
       )}
+      <Text style={styles.locationCount}>
+        Número de ubicaciones: {locations.length}
+      </Text>
     </View>
   );
 };
