@@ -38,39 +38,42 @@ const calcularAreaTurf = (locations) => {
   return area;
 };
 
+TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
+  if (error) {
+    console.error(error);
+    return;
+  }
+  if (data) {
+    const { locations } = data;
+    const userId = UserId();
+    const nuevaUbicacion = locations[0];
+
+    if (userId && nuevaUbicacion) {
+      try {
+        await setDoc(
+          doc(db, "locations", userId),
+          {
+            userId,
+            coords: nuevaUbicacion.coords,
+            timestamp: new Date(),
+          },
+          { merge: true }
+        );
+
+        setLocation(nuevaUbicacion);
+        setLocations([nuevaUbicacion]);
+      } catch (error) {
+        console.error("Error actualizando la ubicación: ", error);
+      }
+    }
+  }
+});
+
 const MapScreen = () => {
   const { setLocation, locations, setLocations } = useContext(LocationContext);
   const [userId, setUserId] = useState(UserId());
   const [initialRegion, setInitialRegion] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
-    if (error) {
-      console.error(error);
-      return;
-    }
-    if (data) {
-      const { locations } = data;
-      const userId = UserId();
-      const nuevaUbicacion = locations[0];
-
-      if (userId && nuevaUbicacion) {
-        try {
-          await setDoc(doc(db, "locations", userId), {
-            userId,
-            coords: nuevaUbicacion.coords,
-            timestamp: new Date(),
-          });
-
-          // Actualizar el estado de la ubicación en la aplicación
-          setLocation(nuevaUbicacion);
-          setLocations([nuevaUbicacion]); // Mantener solo la última ubicación
-        } catch (error) {
-          console.error("Error actualizando la ubicación: ", error);
-        }
-      }
-    }
-  });
 
   useEffect(() => {
     const user = auth.currentUser;
@@ -92,7 +95,9 @@ const MapScreen = () => {
         let { status: bgStatus } =
           await Location.requestBackgroundPermissionsAsync();
         if (bgStatus !== "granted") {
-          Alert.alert("Permiso para acceder a la ubicación en segundo plano denegado");
+          Alert.alert(
+            "Permiso para acceder a la ubicación en segundo plano denegado"
+          );
           return;
         }
 
@@ -108,16 +113,19 @@ const MapScreen = () => {
         });
         setLoading(false);
 
-        await setDoc(doc(db, "locations", userId), {
-          userId,
-          coords: ubicacionInicial.coords,
-          timestamp: new Date(),
-        });
+        await setDoc(
+          doc(db, "locations", userId),
+          {
+            userId,
+            coords: ubicacionInicial.coords,
+            timestamp: new Date(),
+          },
+          { merge: true }
+        );
 
         await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
           accuracy: Location.Accuracy.BestForNavigation,
           distanceInterval: 10,
-          
           timeInterval: 10000,
           deferredUpdatesInterval: 1000,
           showsBackgroundLocationIndicator: true,
@@ -134,12 +142,35 @@ const MapScreen = () => {
       if (doc.exists) {
         const nuevaUbicacion = doc.data();
         setLocation(nuevaUbicacion);
-        setLocations([nuevaUbicacion]); // Mantener solo la última ubicación
+        setLocations([nuevaUbicacion]);
       }
     });
 
     return () => unsubscribe();
   }, [userId]);
+
+  const actualizarUbicacion = async () => {
+    try {
+      const nuevaUbicacion = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Highest,
+      });
+
+      await setDoc(
+        doc(db, "locations", userId),
+        {
+          userId,
+          coords: nuevaUbicacion.coords,
+          timestamp: new Date(),
+        },
+        { merge: true }
+      );
+
+      setLocation(nuevaUbicacion);
+      setLocations([nuevaUbicacion]);
+    } catch (error) {
+      console.error("Error actualizando la ubicación manualmente: ", error);
+    }
+  };
 
   const handlePolygonPress = () => {
     const area = calcularAreaTurf(locations);
@@ -189,6 +220,7 @@ const MapScreen = () => {
           onPress={handlePolygonPress}
         />
       )}
+      <Button title="Actualizar Ubicación" onPress={actualizarUbicacion} />
       <Text style={styles.locationCount}>
         Número de ubicaciones: {locations.length}
       </Text>
