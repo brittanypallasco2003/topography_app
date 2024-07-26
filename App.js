@@ -1,11 +1,14 @@
 import { StatusBar } from "expo-status-bar";
 import AppNav from "./navigation/AppNav";
+import { LocationProvider } from "./context/LocationContext";
 
 const App = () => {
   return (
     <>
       <StatusBar style="auto" />
-      <AppNav />
+      <LocationProvider>
+        <AppNav />
+      </LocationProvider>
     </>
   );
 };
