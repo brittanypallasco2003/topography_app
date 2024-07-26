@@ -29,6 +29,5 @@ yarn-error.*
 *.pem
 # typescript
 *.tsbuildinfo
-
 *.env
 
