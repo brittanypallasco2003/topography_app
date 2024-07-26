@@ -1,22 +1,36 @@
 import React, { useState } from "react";
 import { View, Button, Text, StyleSheet, Alert } from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../utils/firebaseConfig";
+import { auth, db } from "../utils/firebaseConfig";
 import { useNavigation } from "@react-navigation/native";
 import { IconButton, TextInput } from "react-native-paper";
-
+import { doc, getDoc } from "firebase/firestore";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigation = useNavigation();
   const [mostrarPassword, setmostrarPassword] = useState(false);
+  const navigation = useNavigation();
+
   const handleLogin = async () => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      Alert.alert("Login Successful");
-      // Navigate to the next screen after successful login
-      navigation.navigate("Home");
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Obtener el rol del usuario desde Firestore
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        if (userData.role === 'admin') {
+          Alert.alert("Login Successful", "Welcome, Admin!");
+          navigation.navigate("AdminStack"); 
+        } else {
+          Alert.alert("Login Successful", "Welcome, User!");
+          navigation.navigate("Home"); 
+        }
+      } else {
+        Alert.alert("No user data found");
+      }
     } catch (error) {
       Alert.alert("Login Failed", error.message);
     }
@@ -29,7 +43,7 @@ const LoginScreen = () => {
   return (
     <View style={styles.container}>
       <TextInput
-       mode="outlined"
+        mode="outlined"
         placeholder="Email"
         value={email}
         onChangeText={(texto) => { setEmail(texto) }}

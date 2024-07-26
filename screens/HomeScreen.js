@@ -1,12 +1,16 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import { Button } from 'react-native-paper';
 
 const HomeScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Home</Text>
-      <Button title="Go to Map" onPress={() => navigation.navigate('Map')} />
-      <Button title="User Management" onPress={() => navigation.navigate('UserManagement')} />
+      <Button 
+      mode='contained'
+      onPress={() => navigation.navigate("Map")}>
+        Visualizar mapa
+      </Button>
     </View>
   );
 };

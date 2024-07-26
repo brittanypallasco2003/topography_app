@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { doc, setDoc } from 'firebase/firestore';
 import RNPickerSelect from 'react-native-picker-select';
 
-const RegisterScreen = () => {
+const CrearUser = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -23,7 +23,6 @@ const RegisterScreen = () => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Guardar el rol del usuario en Firestore
       await setDoc(doc(db, 'users', user.uid), {
         email: user.email,
         role: role,
@@ -63,13 +62,14 @@ const RegisterScreen = () => {
       <RNPickerSelect
         onValueChange={(value) => setRole(value)}
         items={[
-          { label: 'usuario', value: 'usuario' },
+          { label: 'Usuario', value: 'usuario' },
           { label: 'Administrador', value: 'administrador' },
         ]}
+        style={pickerSelectStyles}
         value={role}
         placeholder={{ label: "Seleccione el rol", value: null }}
       />
-      <Button title="Register" onPress={handleRegister} />
+      <Button title="Agregar Usuario" onPress={handleRegister} />
     </View>
   );
 };
@@ -108,4 +108,4 @@ const pickerSelectStyles = StyleSheet.create({
   },
 });
 
-export default RegisterScreen;
+export default CrearUser;
