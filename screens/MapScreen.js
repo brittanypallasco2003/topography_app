@@ -1,113 +1,152 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Button, Alert, ActivityIndicator, Text } from 'react-native';
-import MapView, { Marker, Polygon } from 'react-native-maps';
-import { collection, doc, setDoc, onSnapshot } from "firebase/firestore"; 
-import { db, auth } from '../utils/firebaseConfig';
-import * as turf from '@turf/turf';
-import { getCurrentLocation, watchLocation } from '../services/location';
+import React, { useState, useEffect, useContext } from "react";
+import {
+  View,
+  StyleSheet,
+  Button,
+  Alert,
+  ActivityIndicator,
+  Text,
+} from "react-native";
+import MapView, { Marker, Polygon } from "react-native-maps";
+import { collection, doc, setDoc, onSnapshot } from "firebase/firestore";
+import { db, auth } from "../utils/firebaseConfig";
+import * as turf from "@turf/turf";
+import * as Location from "expo-location";
+import { LocationContext } from "../context/LocationContext";
+import * as TaskManager from "expo-task-manager";
+
+const LOCATION_TASK_NAME = "background-location-task";
 
 const UserId = () => {
   const user = auth.currentUser;
   if (user && user.uid) {
     return user.uid;
   } else {
-    Alert.alert('No user logged in');
-    return;
+    Alert.alert("No hay usuario conectado");
+    return null;
   }
 };
 
-const calculateAreaTurf = (locations) => {
-  const coordinates = locations.map(loc => [loc.coords.longitude, loc.coords.latitude]);
-  coordinates.push(coordinates[0]); 
+const calcularAreaTurf = (locations) => {
+  const coordinates = locations.map((loc) => [
+    loc.coords.longitude,
+    loc.coords.latitude,
+  ]);
+  coordinates.push(coordinates[0]);
   const polygon = turf.polygon([coordinates]);
   const area = turf.area(polygon);
   return area;
 };
 
 const MapScreen = () => {
-  const [location, setLocation] = useState(null);
-  const [locations, setLocations] = useState([]);
-  const [userId, setUserId] = useState(UserId);
-  const [region, setRegion] = useState(null);
+  const { setLocation, locations, setLocations } = useContext(LocationContext);
+  const [userId, setUserId] = useState(UserId());
+  const [initialRegion, setInitialRegion] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
+    if (error) {
+      console.error(error);
+      return;
+    }
+    if (data) {
+      const { locations } = data;
+      const userId = UserId();
+      const nuevaUbicacion = locations[0];
+
+      if (userId && nuevaUbicacion) {
+        try {
+          await setDoc(doc(db, "locations", userId), {
+            userId,
+            coords: nuevaUbicacion.coords,
+            timestamp: new Date(),
+          });
+
+          // Actualizar el estado de la ubicación en la aplicación
+          setLocation(nuevaUbicacion);
+          setLocations([nuevaUbicacion]); // Mantener solo la última ubicación
+        } catch (error) {
+          console.error("Error actualizando la ubicación: ", error);
+        }
+      }
+    }
+  });
 
   useEffect(() => {
     const user = auth.currentUser;
     if (user) {
-      setUserId(user.uid); // Usa el ID del usuario autenticado
+      setUserId(user.uid);
     } else {
-      Alert.alert('No user logged in');
+      Alert.alert("No hay usuario conectado");
       return;
     }
+
     (async () => {
       try {
-        let initialLocation = await getCurrentLocation();
-        setLocation(initialLocation);
-        setRegion({
-          latitude: initialLocation.coords.latitude,
-          longitude: initialLocation.coords.longitude,
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          Alert.alert("Permiso para acceder a la ubicación denegado");
+          return;
+        }
+
+        let { status: bgStatus } =
+          await Location.requestBackgroundPermissionsAsync();
+        if (bgStatus !== "granted") {
+          Alert.alert("Permiso para acceder a la ubicación en segundo plano denegado");
+          return;
+        }
+
+        const ubicacionInicial = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Highest,
+        });
+        setLocation(ubicacionInicial);
+        setInitialRegion({
+          latitude: ubicacionInicial.coords.latitude,
+          longitude: ubicacionInicial.coords.longitude,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         });
         setLoading(false);
 
         await setDoc(doc(db, "locations", userId), {
-          coords: initialLocation.coords,
+          userId,
+          coords: ubicacionInicial.coords,
           timestamp: new Date(),
         });
 
-        await watchLocation(async (newLocation, distanceThreshold) => {
-          if (location) {
-            const distance = turf.distance(
-              [location.coords.longitude, location.coords.latitude],
-              [newLocation.coords.longitude, newLocation.coords.latitude],
-              { units: 'meters' }
-            );
-
-            if (distance > distanceThreshold) {
-              setLocation(newLocation);
-              setRegion({
-                latitude: newLocation.coords.latitude,
-                longitude: newLocation.coords.longitude,
-                latitudeDelta: 0.0922,
-                longitudeDelta: 0.0421,
-              });
-
-              // Actualizar la ubicación en Firestore
-              await setDoc(doc(db, "locations", userId), {
-                coords: newLocation.coords,
-                timestamp: new Date(),
-              });
-            }
-          } else {
-            setLocation(newLocation);
-            setRegion({
-              latitude: newLocation.coords.latitude,
-              longitude: newLocation.coords.longitude,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            });
-          }
+        await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+          accuracy: Location.Accuracy.BestForNavigation,
+          distanceInterval: 10,
+          
+          timeInterval: 10000,
+          deferredUpdatesInterval: 1000,
+          showsBackgroundLocationIndicator: true,
         });
       } catch (error) {
-        console.error("Error in location setup: ", error);
+        console.error("Error en la configuración de ubicación: ", error);
         setLoading(false);
       }
     })();
   }, []);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, "locations"), (snapshot) => {
-      const locs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setLocations(locs);
+    const unsubscribe = onSnapshot(doc(db, "locations", userId), (doc) => {
+      if (doc.exists) {
+        const nuevaUbicacion = doc.data();
+        setLocation(nuevaUbicacion);
+        setLocations([nuevaUbicacion]); // Mantener solo la última ubicación
+      }
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [userId]);
 
   const handlePolygonPress = () => {
-    const area = calculateAreaTurf(locations);
-    Alert.alert(`Área del Polígono`, `El área del polígono es ${area.toFixed(2)} metros cuadrados.`);
+    const area = calcularAreaTurf(locations);
+    Alert.alert(
+      `Área del Polígono`,
+      `El área del polígono es ${area.toFixed(2)} metros cuadrados.`
+    );
   };
 
   if (loading) {
@@ -120,33 +159,21 @@ const MapScreen = () => {
 
   return (
     <View style={styles.container}>
-      {region && (
-        <MapView
-          style={styles.map}
-          region={region}
-        >
-          {location && (
+      {initialRegion && (
+        <MapView style={styles.map} initialRegion={initialRegion}>
+          {locations.map((loc, index) => (
             <Marker
-              coordinate={{
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
-              }}
-              title="Your Location"
-            />
-          )}
-          {locations.map(loc => (
-            <Marker
-              key={loc.id}
+              key={index}
               coordinate={{
                 latitude: loc.coords.latitude,
                 longitude: loc.coords.longitude,
               }}
-              title={`User: ${loc.id}`}
+              title={`Usuario: ${loc.userId}`}
             />
           ))}
           {locations.length >= 3 && (
             <Polygon
-              coordinates={locations.map(loc => ({
+              coordinates={locations.map((loc) => ({
                 latitude: loc.coords.latitude,
                 longitude: loc.coords.longitude,
               }))}
@@ -157,7 +184,10 @@ const MapScreen = () => {
         </MapView>
       )}
       {locations.length >= 3 && (
-        <Button title="Formar Polígono y Calcular Área" onPress={handlePolygonPress} />
+        <Button
+          title="Formar Polígono y Calcular Área"
+          onPress={handlePolygonPress}
+        />
       )}
       <Text style={styles.locationCount}>
         Número de ubicaciones: {locations.length}
@@ -175,8 +205,13 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  locationCount: {
+    textAlign: "center",
+    padding: 10,
+    fontSize: 16,
   },
 });
 
