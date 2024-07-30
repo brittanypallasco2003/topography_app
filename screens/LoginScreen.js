@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { View, Button, Text, StyleSheet, Alert } from "react-native";
+import { View, Text, StyleSheet, Alert, Image } from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../utils/firebaseConfig";
 import { useNavigation } from "@react-navigation/native";
-import { IconButton, TextInput } from "react-native-paper";
+import { Avatar, Button, TextInput } from "react-native-paper";
 import { doc, getDoc } from "firebase/firestore";
 
 const LoginScreen = () => {
@@ -14,19 +14,23 @@ const LoginScreen = () => {
 
   const handleLogin = async () => {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = userCredential.user;
 
       // Obtener el rol del usuario desde Firestore
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      const userDoc = await getDoc(doc(db, "users", user.uid));
       if (userDoc.exists()) {
         const userData = userDoc.data();
-        if (userData.role === 'admin') {
-          Alert.alert("Login Successful", "Welcome, Admin!");
-          navigation.navigate("AdminStack"); 
+        if (userData.role === "admin") {
+          Alert.alert("Bienvenido, Admin!");
+          navigation.navigate("AdminStack");
         } else {
-          Alert.alert("Login Successful", "Welcome, User!");
-          navigation.navigate("Home"); 
+          Alert.alert("Bienvenido, Usuario!");
+          navigation.navigate("Home");
         }
       } else {
         Alert.alert("No user data found");
@@ -42,46 +46,62 @@ const LoginScreen = () => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Topography App</Text>
+      <Avatar.Image size={300} source={require("../assets/image3.png")} />
       <TextInput
         mode="outlined"
-        placeholder="Email"
+        placeholder="Correo Eléctrónico"
         value={email}
-        onChangeText={(texto) => { setEmail(texto) }}
+        onChangeText={(texto) => {
+          setEmail(texto);
+        }}
         keyboardType="email-address"
         autoCapitalize="none"
       />
       <TextInput
         secureTextEntry={!mostrarPassword}
         placeholder="Contraseña"
-        mode='outlined'
+        mode="outlined"
         onChangeText={(texto) => setPassword(texto)}
         value={password}
-        right={<TextInput.Icon
-          icon={mostrarPassword ? "eye" : "eye-off"}
-          size={15}
-          iconColor="#000"
-          rippleColor={"#000"}
-          onPress={() => setmostrarPassword(!mostrarPassword)}
-        />}
+        right={
+          <TextInput.Icon
+            icon={mostrarPassword ? "eye" : "eye-off"}
+            size={20}
+            iconColor="#000"
+            rippleColor={"#000"}
+            onPress={() => setmostrarPassword(!mostrarPassword)}
+          />
+        }
       />
-      <Button title="Login" onPress={handleLogin} />
-      <Button title="Register" onPress={handleNavigateToRegister} />
+      <Button mode="elevated" onPress={() => handleLogin()}>
+        Iniciar Sesión
+      </Button>
+      <Button
+        mode="elevated"
+        onPress={() => {
+          handleNavigateToRegister();
+        }}
+      >
+        Registro
+      </Button>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  title: {
+    fontSize: 20,
+    textAlign: "center",
+  },
   container: {
     flex: 1,
     justifyContent: "center",
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
   },
-  input: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    marginBottom: 12,
-    paddingHorizontal: 8,
+  image: {
+    height: 100,
+    aspectRatio: 1,
   },
 });
 
