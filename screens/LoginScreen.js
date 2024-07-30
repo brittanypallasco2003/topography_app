@@ -47,7 +47,8 @@ const LoginScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Topography App</Text>
-      <Avatar.Image size={300} source={require("../assets/image3.png")} />
+      <Avatar.Image size={300} source={require("../assets/image1.png")} 
+      style={{backgroundColor:"rgb(240, 219, 255)"}}/>
       <TextInput
         mode="outlined"
         placeholder="Correo Eléctrónico"
