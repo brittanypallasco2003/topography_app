@@ -3,15 +3,15 @@ import { View, Text, StyleSheet, Alert, Image } from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../utils/firebaseConfig";
 import { useNavigation } from "@react-navigation/native";
-import { Avatar, Button, TextInput } from "react-native-paper";
+import { Avatar, Button, TextInput, useTheme } from "react-native-paper";
 import { doc, getDoc } from "firebase/firestore";
-
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mostrarPassword, setmostrarPassword] = useState(false);
   const navigation = useNavigation();
 
+  const theme = useTheme();
   const handleLogin = async () => {
     try {
       const userCredential = await signInWithEmailAndPassword(
@@ -47,8 +47,8 @@ const LoginScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Topography App</Text>
-      <Avatar.Image size={300} source={require("../assets/image1.png")} 
-      style={{backgroundColor:"rgb(240, 219, 255)"}}/>
+      {/* <Avatar.Image size={300} source={require("../assets/image1.png")} /> */}
+      <Avatar.Icon icon={"map-search"} size={300}/>
       <TextInput
         mode="outlined"
         placeholder="Correo Eléctrónico"
@@ -75,10 +75,17 @@ const LoginScreen = () => {
           />
         }
       />
-      <Button mode="elevated" onPress={() => handleLogin()}>
+      <Button
+        mode="elevated"
+        textColor="#fff"
+        buttonColor={theme.colors.primary}
+        onPress={() => handleLogin()}
+      >
         Iniciar Sesión
       </Button>
       <Button
+        textColor="#fff"
+        buttonColor={theme.colors.primary}
         mode="elevated"
         onPress={() => {
           handleNavigateToRegister();
