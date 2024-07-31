@@ -1,7 +1,18 @@
 import { StatusBar } from "expo-status-bar";
 import AppNav from "./navigation/AppNav";
 import { LocationProvider } from "./context/LocationContext";
-import {MD3LightTheme as DefaultTheme, PaperProvider } from "react-native-paper";
+import {
+  MD3LightTheme as DefaultTheme,
+  PaperProvider,
+} from "react-native-paper";
+import {
+  useFonts,
+  Poppins_500Medium,
+  Poppins_600SemiBold,
+  Poppins_700Bold,
+} from "@expo-google-fonts/poppins";
+import { useEffect, useState } from "react";
+import ActivityIndicatorComp from "./components/ActivityIndicator";
 
 const theme = {
   ...DefaultTheme,
@@ -15,16 +26,16 @@ const theme = {
     onSecondary: "rgb(255, 255, 255)",
     secondaryContainer: "rgb(216, 227, 248)",
     onSecondaryContainer: "rgb(17, 28, 43)",
-    // "tertiary": "rgb(110, 86, 118)",
-    // "onTertiary": "rgb(255, 255, 255)",
-    // "tertiaryContainer": "rgb(247, 216, 255)",
+    tertiary: "rgb(110, 86, 118)",
+    onTertiary: "rgb(255, 255, 255)",
+    tertiaryContainer: "rgb(247, 216, 255)",
     // "onTertiaryContainer": "rgb(39, 20, 48)",
     // "error": "rgb(186, 26, 26)",
     // "onError": "rgb(255, 255, 255)",
     // "errorContainer": "rgb(255, 218, 214)",
     // "onErrorContainer": "rgb(65, 0, 2)",
     background: "rgb(253, 252, 255)",
-    // "onBackground": "rgb(26, 28, 30)",
+    onBackground: "rgb(26, 28, 30)",
     surface: "rgb(253, 252, 255)",
     // "onSurface": "rgb(26, 28, 30)",
     // "surfaceVariant": "rgb(224, 226, 236)",
@@ -37,20 +48,47 @@ const theme = {
     // "inverseOnSurface": "rgb(241, 240, 244)",
     // "inversePrimary": "rgb(165, 200, 255)",
     elevation: {
-    level0: "transparent",
-    level1: "rgb(240, 244, 251)",
-    level2: "rgb(233, 239, 249)",
-    level3: "rgb(225, 235, 246)",
-    level4: "rgb(223, 233, 245)",
-    level5: "rgb(218, 230, 244)"
+      level0: "transparent",
+      level1: "rgb(240, 244, 251)",
+      level2: "rgb(233, 239, 249)",
+      level3: "rgb(225, 235, 246)",
+      level4: "rgb(223, 233, 245)",
+      level5: "rgb(218, 230, 244)",
     },
-    // "surfaceDisabled": "rgba(26, 28, 30, 0.12)",
+    surfaceDisabled: "rgba(26, 28, 30, 0.12)",
     // "onSurfaceDisabled": "rgba(26, 28, 30, 0.38)",
     // "backdrop": "rgba(45, 49, 56, 0.4)"
   },
 };
 
 const App = () => {
+  const [appIsReady, setAppIsReady] = useState(false);
+  let [fontsLoaded] = useFonts({
+    Poppins_500Medium,
+    Poppins_600SemiBold,
+    Poppins_700Bold,
+  });
+
+  useEffect(() => {
+    async function prepare() {
+      try {
+        if (fontsLoaded) {
+          // await SplashScreen.hideAsync();
+          setTimeout(() => {
+            setAppIsReady(true);
+          }, 1200);
+        }
+      } catch (error) {
+        console.warn(error);
+      }
+    }
+
+    prepare();
+  }, [fontsLoaded, appIsReady]);
+
+  if (!appIsReady) {
+    return <ActivityIndicatorComp />;
+  }
   return (
     <>
       <StatusBar style="auto" />

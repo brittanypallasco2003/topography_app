@@ -5,38 +5,47 @@ import { auth, db } from "../utils/firebaseConfig";
 import { useNavigation } from "@react-navigation/native";
 import { Avatar, Button, TextInput, useTheme } from "react-native-paper";
 import { doc, getDoc } from "firebase/firestore";
+import { scale } from "react-native-size-matters";
+import { SafeAreaView } from "react-native-safe-area-context";
+import ActivityIndicatorComp from "../components/ActivityIndicator";
+import Loading from "../components/Loading";
+
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mostrarPassword, setmostrarPassword] = useState(false);
+  const [loading, setloading] = useState(false);
   const navigation = useNavigation();
 
   const theme = useTheme();
   const handleLogin = async () => {
-    try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const user = userCredential.user;
+   
+      try {
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        const user = userCredential.user;
 
-      // Obtener el rol del usuario desde Firestore
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        if (userData.role === "admin") {
-          Alert.alert("Bienvenido, Admin!");
-          navigation.navigate("AdminStack");
+        // Obtener el rol del usuario desde Firestore
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          if (userData.role === "admin") {
+            Alert.alert("Bienvenido, Admin!");
+            navigation.navigate("AdminStack");
+          } else {
+            Alert.alert("Bienvenido, Usuario!");
+            navigation.navigate("Home");
+          }
         } else {
-          Alert.alert("Bienvenido, Usuario!");
-          navigation.navigate("Home");
+          Alert.alert("No user data found");
         }
-      } else {
-        Alert.alert("No user data found");
-      }
-    } catch (error) {
-      Alert.alert("Login Failed", error.message);
+      } catch (error) {
+        Alert.alert("Login Failed", error.message);
+      }finally{
+        setloading(false)
     }
   };
 
@@ -45,71 +54,87 @@ const LoginScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Topography App</Text>
-      {/* <Avatar.Image size={300} source={require("../assets/image1.png")} /> */}
-      <Avatar.Icon icon={"map-search"} size={300}/>
-      <TextInput
-        mode="outlined"
-        placeholder="Correo Eléctrónico"
-        value={email}
-        onChangeText={(texto) => {
-          setEmail(texto);
-        }}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <TextInput
-        secureTextEntry={!mostrarPassword}
-        placeholder="Contraseña"
-        mode="outlined"
-        onChangeText={(texto) => setPassword(texto)}
-        value={password}
-        right={
-          <TextInput.Icon
-            icon={mostrarPassword ? "eye" : "eye-off"}
-            size={20}
-            iconColor="#000"
-            rippleColor={"#000"}
-            onPress={() => setmostrarPassword(!mostrarPassword)}
-          />
-        }
-      />
-      <Button
-        mode="elevated"
-        textColor="#fff"
-        buttonColor={theme.colors.primary}
-        onPress={() => handleLogin()}
-      >
-        Iniciar Sesión
-      </Button>
-      <Button
-        textColor="#fff"
-        buttonColor={theme.colors.primary}
-        mode="elevated"
-        onPress={() => {
-          handleNavigateToRegister();
-        }}
-      >
-        Registro
-      </Button>
-    </View>
+    <SafeAreaView style={styles.container}>
+      <View style={{ paddingHorizontal: 20 }}>
+        <Text style={styles.title}>Topography App</Text>
+        <Avatar.Icon icon={"map-search"} size={300} />
+        <Loading loading={loading}/>
+        <TextInput
+          mode="outlined"
+          contentStyle={styles.input}
+          placeholder="Correo Electrónico"
+          value={email}
+          onChangeText={(texto) => {
+            setEmail(texto);
+          }}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        <TextInput
+          contentStyle={styles.input}
+          secureTextEntry={!mostrarPassword}
+          placeholder="Contraseña"
+          mode="outlined"
+          onChangeText={(texto) => setPassword(texto)}
+          value={password}
+          right={
+            <TextInput.Icon
+              icon={mostrarPassword ? "eye" : "eye-off"}
+              size={20}
+              iconColor="#000"
+              rippleColor={"#000"}
+              onPress={() => setmostrarPassword(!mostrarPassword)}
+            />
+          }
+        />
+        <Button
+          labelStyle={styles.buttonText}
+          mode="elevated"
+          textColor="#fff"
+          buttonColor={theme.colors.primary}
+          onPress={() => {
+            handleLogin();
+            setloading(true);
+          }}
+        >
+          Iniciar Sesión
+        </Button>
+        <Button
+          textColor="#fff"
+          buttonColor={theme.colors.primary}
+          mode="elevated"
+          onPress={() => {
+            handleNavigateToRegister();
+          }}
+        >
+          Registro
+        </Button>
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   title: {
-    fontSize: 20,
+    fontSize: scale(22),
     textAlign: "center",
+    fontFamily: "Poppins_700Bold",
   },
   container: {
     flex: 1,
     justifyContent: "center",
-    paddingHorizontal: 20,
   },
   image: {
     height: 100,
     aspectRatio: 1,
+  },
+  buttonText: {
+    fontFamily: "Poppins_600SemiBold",
+    fontSize: scale(12),
+  },
+  input: {
+    fontFamily: "Poppins_500Medium",
+    fontSize: scale(11),
   },
 });
 

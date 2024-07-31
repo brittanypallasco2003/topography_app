@@ -38,36 +38,7 @@ const calcularAreaTurf = (locations) => {
   return area;
 };
 
-TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
-  if (error) {
-    console.error(error);
-    return;
-  }
-  if (data) {
-    const { locations } = data;
-    const userId = UserId();
-    const nuevaUbicacion = locations[0];
 
-    if (userId && nuevaUbicacion) {
-      try {
-        await setDoc(
-          doc(db, "locations", userId),
-          {
-            userId,
-            coords: nuevaUbicacion.coords,
-            timestamp: new Date(),
-          },
-          { merge: true }
-        );
-
-        setLocation(nuevaUbicacion);
-        setLocations([nuevaUbicacion]);
-      } catch (error) {
-        console.error("Error actualizando la ubicación: ", error);
-      }
-    }
-  }
-});
 
 const MapScreen = () => {
   const { setLocation, locations, setLocations } = useContext(LocationContext);
@@ -92,51 +63,75 @@ const MapScreen = () => {
           return;
         }
 
-        let { status: bgStatus } =
-          await Location.requestBackgroundPermissionsAsync();
-        if (bgStatus !== "granted") {
-          Alert.alert(
-            "Permiso para acceder a la ubicación en segundo plano denegado"
-          );
-          return;
-        }
-
         const ubicacionInicial = await Location.getCurrentPositionAsync({
           accuracy: Location.Accuracy.Highest,
         });
-        setLocation(ubicacionInicial);
-        setInitialRegion({
-          latitude: ubicacionInicial.coords.latitude,
-          longitude: ubicacionInicial.coords.longitude,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-        });
-        setLoading(false);
 
-        await setDoc(
-          doc(db, "locations", userId),
-          {
-            userId,
-            coords: ubicacionInicial.coords,
-            timestamp: new Date(),
-          },
-          { merge: true }
-        );
+        if (ubicacionInicial && ubicacionInicial.coords) {
+          setLocation(ubicacionInicial);
+          setInitialRegion({
+            latitude: ubicacionInicial.coords.latitude,
+            longitude: ubicacionInicial.coords.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          });
 
-        await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-          accuracy: Location.Accuracy.BestForNavigation,
-          distanceInterval: 10,
-          timeInterval: 10000,
-          deferredUpdatesInterval: 1000,
-          showsBackgroundLocationIndicator: true,
-        });
+          await setDoc(
+            doc(db, "locations", userId),
+            {
+              userId,
+              coords: ubicacionInicial.coords,
+              timestamp: new Date(),
+            },
+            { merge: true }
+          );
+
+          await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+            accuracy: Location.Accuracy.BestForNavigation,
+            distanceInterval: 10,
+            timeInterval: 10000,
+            deferredUpdatesInterval: 1000,
+            showsBackgroundLocationIndicator: true,
+          });
+        } else {
+          console.error("Ubicación inicial no válida: ", ubicacionInicial);
+        }
       } catch (error) {
         console.error("Error en la configuración de ubicación: ", error);
-        setLoading(false);
       }
     })();
   }, []);
 
+  TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
+    if (error) {
+      console.error(error);
+      return;
+    }
+    if (data) {
+      const { locations } = data;
+      const userId = UserId();
+      const nuevaUbicacion = locations[0];
+  
+      if (userId && nuevaUbicacion && nuevaUbicacion.coords) {
+        try {
+          await setDoc(
+            doc(db, "locations", userId),
+            {
+              userId,
+              coords: nuevaUbicacion.coords,
+              timestamp: new Date(),
+            },
+            { merge: true }
+          );
+  
+          setLocation(nuevaUbicacion);
+          setLocations([nuevaUbicacion]);
+        } catch (error) {
+          console.error("Error actualizando la ubicación: ", error);
+        }
+      }
+    }
+  });
   useEffect(() => {
     const unsubscribe = onSnapshot(doc(db, "locations", userId), (doc) => {
       if (doc.exists) {
@@ -155,18 +150,22 @@ const MapScreen = () => {
         accuracy: Location.Accuracy.Highest,
       });
 
-      await setDoc(
-        doc(db, "locations", userId),
-        {
-          userId,
-          coords: nuevaUbicacion.coords,
-          timestamp: new Date(),
-        },
-        { merge: true }
-      );
+      if (nuevaUbicacion && nuevaUbicacion.coords) {
+        await setDoc(
+          doc(db, "locations", userId),
+          {
+            userId,
+            coords: nuevaUbicacion.coords,
+            timestamp: new Date(),
+          },
+          { merge: true }
+        );
 
-      setLocation(nuevaUbicacion);
-      setLocations([nuevaUbicacion]);
+        setLocation(nuevaUbicacion);
+        setLocations([nuevaUbicacion]);
+      } else {
+        console.error("Nueva ubicación no válida: ", nuevaUbicacion);
+      }
     } catch (error) {
       console.error("Error actualizando la ubicación manualmente: ", error);
     }
@@ -192,16 +191,21 @@ const MapScreen = () => {
     <View style={styles.container}>
       {initialRegion && (
         <MapView style={styles.map} initialRegion={initialRegion}>
-          {locations.map((loc, index) => (
-            <Marker
-              key={index}
-              coordinate={{
-                latitude: loc.coords.latitude,
-                longitude: loc.coords.longitude,
-              }}
-              title={`Usuario: ${loc.userId}`}
-            />
-          ))}
+          {locations.length > 0 &&
+            locations.map((loc, index) => {
+              if (loc && loc.coords) {
+                return (
+                  <Marker
+                    key={index}
+                    coordinate={{
+                      latitude: loc.coords.latitude,
+                      longitude: loc.coords.longitude,
+                    }}
+                    title={`Usuario: ${loc.userId}`}
+                  />
+                );
+              }
+            })}
           {locations.length >= 3 && (
             <Polygon
               coordinates={locations.map((loc) => ({
