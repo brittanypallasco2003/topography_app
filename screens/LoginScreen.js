@@ -32,11 +32,9 @@ const LoginScreen = () => {
         const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists()) {
           const userData = userDoc.data();
-          if (userData.role === "admin") {
-            Alert.alert("Bienvenido, Admin!");
+          if (userData.role === "admin" ) {
             navigation.navigate("AdminStack");
           } else {
-            Alert.alert("Bienvenido, Usuario!");
             navigation.navigate("Home");
           }
         } else {

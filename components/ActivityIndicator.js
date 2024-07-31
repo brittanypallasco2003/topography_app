@@ -26,11 +26,7 @@ const ActivityIndicatorComp = () => {
           color="#fff"
         />
         <View>
-          <ActivityIndicator
-            animating={true}
-            size={scale(60)}
-            color="#fff"
-          />
+          <ActivityIndicator animating={true} size={scale(60)} color="#fff" />
         </View>
       </SafeAreaView>
     </>

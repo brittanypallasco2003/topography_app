@@ -2,11 +2,15 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
 import { Button } from "react-native-paper";
 import MapView from "react-native-maps";
+import { scale } from "react-native-size-matters";
 
 const AdminHome = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.mapContainer} onLongPress={() => navigation.navigate("Map")}>
+      <TouchableOpacity
+        style={styles.mapContainer}
+        onLongPress={() => navigation.navigate("Map")}
+      >
         <MapView
           style={styles.map}
           initialRegion={{
@@ -17,17 +21,31 @@ const AdminHome = ({ navigation }) => {
           }}
         />
       </TouchableOpacity>
-      <Button mode="contained" onPress={() => navigation.navigate("Map")}>
+      <Button
+        mode="contained"
+        labelStyle={styles.buttonText}
+        onPress={() => navigation.navigate("Map")}
+      >
         Visualizar mapa
       </Button>
       <Text>Administrar usuarios</Text>
-      <Button mode="contained" onPress={() => navigation.navigate("CrearUser")}>
+      <Button
+        mode="contained"
+        labelStyle={styles.buttonText}
+        onPress={() => navigation.navigate("CrearUser")}
+      >
         Crear usuarios
       </Button>
-      <Button mode="contained" onPress={() => navigation.navigate("ListaUser")}>
+      <Button
+        mode="contained"
+        labelStyle={styles.buttonText}
+        onPress={() => navigation.navigate("ListaUser")}
+      >
         Eliminar usuarios
       </Button>
-      <Button mode="contained" onPress={() => navigation.navigate("ListaUser")}>
+      <Button mode="contained" 
+      labelStyle={styles.buttonText}
+      onPress={() => navigation.navigate("ListaUser")}>
         Desactivar usuarios
       </Button>
     </View>
@@ -45,6 +63,10 @@ const styles = StyleSheet.create({
   },
   map: {
     ...StyleSheet.absoluteFillObject,
+  },
+  buttonText: {
+    fontFamily: "Poppins_600SemiBold",
+    fontSize: scale(12),
   },
 });
 
