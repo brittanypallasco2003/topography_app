@@ -209,8 +209,7 @@ const MapScreen = () => {
       {initialRegion && (
         <MapView style={styles.map} initialRegion={initialRegion}>
           {locations.map((loc, index) => {
-            // Asigna un color basado en el índice del marcador
-            const color = colors[index % colors.length]; // Usa módulo para repetir colores si hay más marcadores que colores
+            const color = colors[index % colors.length];
 
             return (
               <Marker
@@ -219,7 +218,7 @@ const MapScreen = () => {
                   latitude: loc.coords?.latitude,
                   longitude: loc.coords?.longitude,
                 }}
-                pinColor={color} // Asigna el color al marcador
+                pinColor={color}
                 title={`Usuario: ${loc.userId} Email: ${loc.email}`}
               />
             );
