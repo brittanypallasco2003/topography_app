@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Alert, Image } from "react-native";
+import { View, Text, StyleSheet, Alert, ScrollView } from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../utils/firebaseConfig";
 import { useNavigation } from "@react-navigation/native";
 import { Avatar, Button, TextInput, useTheme } from "react-native-paper";
 import { doc, getDoc } from "firebase/firestore";
-import { scale } from "react-native-size-matters";
+import { moderateScale, scale } from "react-native-size-matters";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ActivityIndicatorComp from "../components/ActivityIndicator";
+
 import Loading from "../components/Loading";
 
 const LoginScreen = () => {
@@ -54,61 +54,63 @@ const LoginScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={{ paddingHorizontal: 20 }}>
-        <Text style={styles.title}>Topography App</Text>
-        <Avatar.Icon icon={"map-search"} size={300} />
-        <Loading loading={loading} />
-        <TextInput
-          mode="outlined"
-          contentStyle={styles.input}
-          placeholder="Correo Electrónico"
-          value={email}
-          onChangeText={(texto) => {
-            setEmail(texto);
-          }}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-        <TextInput
-          contentStyle={styles.input}
-          secureTextEntry={!mostrarPassword}
-          placeholder="Contraseña"
-          mode="outlined"
-          onChangeText={(texto) => setPassword(texto)}
-          value={password}
-          right={
-            <TextInput.Icon
-              icon={mostrarPassword ? "eye" : "eye-off"}
-              size={20}
-              iconColor="#000"
-              rippleColor={"#000"}
-              onPress={() => setmostrarPassword(!mostrarPassword)}
-            />
-          }
-        />
-        <Button
-          labelStyle={styles.buttonText}
-          mode="elevated"
-          textColor="#fff"
-          buttonColor={theme.colors.primary}
-          onPress={() => {
-            handleLogin();
-            setloading(true);
-          }}
-        >
-          Iniciar Sesión
-        </Button>
-        <Button
-          textColor="#fff"
-          buttonColor={theme.colors.primary}
-          mode="elevated"
-          onPress={() => {
-            handleNavigateToRegister();
-          }}
-        >
-          Registro
-        </Button>
-      </View>
+      <ScrollView contentContainerStyle={styles.contentScroll}>
+        <View style={{ paddingHorizontal: moderateScale(20) }}>
+          <Text style={styles.title}>Topography App</Text>
+          <Avatar.Icon icon={"map-search"} size={300} />
+          <Loading loading={loading} />
+          <TextInput
+            mode="outlined"
+            contentStyle={styles.input}
+            placeholder="Correo Electrónico"
+            value={email}
+            onChangeText={(texto) => {
+              setEmail(texto);
+            }}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+          <TextInput
+            contentStyle={styles.input}
+            secureTextEntry={!mostrarPassword}
+            placeholder="Contraseña"
+            mode="outlined"
+            onChangeText={(texto) => setPassword(texto)}
+            value={password}
+            right={
+              <TextInput.Icon
+                icon={mostrarPassword ? "eye" : "eye-off"}
+                size={20}
+                iconColor="#000"
+                rippleColor={"#000"}
+                onPress={() => setmostrarPassword(!mostrarPassword)}
+              />
+            }
+          />
+          <Button
+            labelStyle={styles.buttonText}
+            mode="elevated"
+            textColor="#fff"
+            buttonColor={theme.colors.primary}
+            onPress={() => {
+              handleLogin();
+              setloading(true);
+            }}
+          >
+            Iniciar Sesión
+          </Button>
+          <Button
+            textColor="#fff"
+            buttonColor={theme.colors.primary}
+            mode="elevated"
+            onPress={() => {
+              handleNavigateToRegister();
+            }}
+          >
+            Registro
+          </Button>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -121,7 +123,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: "center",
   },
   image: {
     height: 100,
@@ -134,6 +135,10 @@ const styles = StyleSheet.create({
   input: {
     fontFamily: "Poppins_500Medium",
     fontSize: scale(11),
+  },
+  contentScroll: {
+    flexGrow: 1,
+    justifyContent: "center",
   },
 });
 

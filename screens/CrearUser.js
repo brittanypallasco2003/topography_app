@@ -1,18 +1,21 @@
 import React, { useState } from "react";
-import { View, TextInput, Text, StyleSheet, Alert } from "react-native";
+import { View, Text, StyleSheet, Alert, ScrollView } from "react-native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../utils/firebaseConfig";
 import { useNavigation } from "@react-navigation/native";
 import { doc, setDoc } from "firebase/firestore";
-import { Button, Divider, Menu } from "react-native-paper";
+import { Button, Divider, Menu, TextInput } from "react-native-paper";
+import { scale } from "react-native-size-matters";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const RegisterScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState("user");
   const [visible, setVisible] = React.useState(false);
-
+  const [name, setname] = useState("");
+  const [apellido, setapellido] = useState("");
+  const [telefono, settelefono] = useState("");
   const openMenu = () => setVisible(true);
 
   const closeMenu = () => setVisible(false);
@@ -36,6 +39,7 @@ const RegisterScreen = () => {
       await setDoc(doc(db, "users", user.uid), {
         email: user.email,
         role: role,
+        name: name,
       });
 
       Alert.alert("Registration Successful");
@@ -46,71 +50,95 @@ const RegisterScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Confirm Password"
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        secureTextEntry
-      />
-      <View
-      style={{
-        paddingTop:30,
-        paddingBottom: 50,
-        flexDirection: 'row',
-        justifyContent: 'center',
-      }}>
-        <Menu
-          visible={visible}
-          onDismiss={closeMenu}
-          anchor={
-            <Button mode="elevated" onPress={openMenu}>
-              Seleccionar rol
-            </Button>
-          }
-        >
-          <Menu.Item
-            onPress={() => {
-              setRole("usuario");
-              closeMenu()
-            }}
-            title="Usuario"
-          />
-          <Divider />
-          <Menu.Item
-            onPress={() => {
-              setRole("admin");
-              closeMenu()
-            }}
-            title="Administrador"
-          />
-        </Menu>
-      </View>
-      <Button
-        mode="contained"
-        onPress={() => {
-          handleRegister();
-        }}
+    <SafeAreaView style={{ flex: 1 }}>
+      <ScrollView
+        contentContainerStyle={styles.contentScroll}
+        showsVerticalScrollIndicator={false}
       >
-        Registrar Usuario
-      </Button>
-    </View>
+        <View style={styles.container}>
+          <TextInput
+            mode="outlined"
+            contentStyle={styles.input}
+            placeholder="Nombre"
+            value={name}
+            onChangeText={(texto) => {
+              setname(texto);
+            }}
+          />
+          <TextInput
+            mode="outlined"
+            contentStyle={styles.input}
+            placeholder="Apellido"
+            value={apellido}
+            onChangeText={(texto) => {
+              setapellido(texto);
+            }}
+          />
+          <TextInput
+            mode="outlined"
+            contentStyle={styles.input}
+            placeholder="Número de teléfono"
+            value={telefono}
+            onChangeText={(texto) => {
+              settelefono(texto);
+            }}
+          />
+          <TextInput
+            mode="outlined"
+            contentStyle={styles.input}
+            placeholder="Correo Electrónico"
+            value={email}
+            onChangeText={(texto) => {
+              setEmail(texto);
+            }}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+          <View
+            style={{
+              paddingTop: 30,
+              paddingBottom: 50,
+              flexDirection: "row",
+              justifyContent: "center",
+            }}
+          >
+            <Menu
+              visible={visible}
+              onDismiss={closeMenu}
+              anchor={
+                <Button mode="elevated" onPress={openMenu}>
+                  Seleccionar rol
+                </Button>
+              }
+            >
+              <Menu.Item
+                onPress={() => {
+                  setRole("usuario");
+                  closeMenu();
+                }}
+                title="Usuario"
+              />
+              <Divider />
+              <Menu.Item
+                onPress={() => {
+                  setRole("admin");
+                  closeMenu();
+                }}
+                title="Administrador"
+              />
+            </Menu>
+          </View>
+          <Button
+            mode="contained"
+            onPress={() => {
+              handleRegister();
+            }}
+          >
+            Registrar Usuario
+          </Button>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -121,15 +149,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   input: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    marginBottom: 12,
-    paddingHorizontal: 8,
+    fontFamily: "Poppins_500Medium",
+    fontSize: scale(11),
   },
   optionMenu: {
     marginLeft: "auto",
     marginRight: "auto",
+  },
+  contentScroll: {
+    flexGrow: 1,
+    justifyContent: "center",
   },
 });
 
