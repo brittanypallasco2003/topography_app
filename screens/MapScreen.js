@@ -27,6 +27,9 @@ const UserId = () => {
   }
 };
 
+console.log("email" + auth.currentUser?.email);
+console.log("email" + auth.currentUser);
+
 const calcularAreaTurf = (locations) => {
   const coordinates = locations.map((loc) => [
     loc.coords?.longitude,
@@ -55,6 +58,7 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
           {
             coords: nuevaUbicacion.coords,
             timestamp: new Date(),
+            email: auth.currentUser?.email,
           },
           { merge: true }
         );
@@ -70,8 +74,6 @@ const MapScreen = () => {
   const [userId, setUserId] = useState(UserId());
   const [initialRegion, setInitialRegion] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  console.log("s" + JSON.stringify(locations));
 
   useEffect(() => {
     const user = auth.currentUser;
@@ -114,6 +116,7 @@ const MapScreen = () => {
           {
             coords: ubicacionInicial.coords,
             timestamp: new Date(),
+            email: auth.currentUser?.email,
           },
           { merge: true }
         );
@@ -159,6 +162,7 @@ const MapScreen = () => {
         {
           coords: nuevaUbicacion.coords,
           timestamp: new Date(), // Marca de tiempo de la última actualización
+          email: auth.currentUser?.email,
         },
         { merge: true }
       );
@@ -219,7 +223,7 @@ const MapScreen = () => {
                   longitude: loc.coords?.longitude,
                 }}
                 pinColor={color}
-                title={`Usuario: ${loc.userId} Email: ${loc.email}`}
+                title={`Usuario: ${loc.email}`}
               />
             );
           })}
