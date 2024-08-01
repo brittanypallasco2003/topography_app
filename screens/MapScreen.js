@@ -29,8 +29,8 @@ const UserId = () => {
 
 const calcularAreaTurf = (locations) => {
   const coordinates = locations.map((loc) => [
-    loc.coords.longitude,
-    loc.coords.latitude,
+    loc.coords?.longitude,
+    loc.coords?.latitude,
   ]);
   coordinates.push(coordinates[0]);
   const polygon = turf.polygon([coordinates]);
@@ -53,15 +53,11 @@ TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
         await setDoc(
           doc(db, "locations", userId),
           {
-            userId,
             coords: nuevaUbicacion.coords,
             timestamp: new Date(),
           },
           { merge: true }
         );
-
-        setLocation(nuevaUbicacion);
-        setLocations([nuevaUbicacion]);
       } catch (error) {
         console.error("Error actualizando la ubicación: ", error);
       }
@@ -75,6 +71,8 @@ const MapScreen = () => {
   const [initialRegion, setInitialRegion] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  console.log("s" + JSON.stringify(locations));
+
   useEffect(() => {
     const user = auth.currentUser;
     if (user) {
@@ -83,7 +81,6 @@ const MapScreen = () => {
       Alert.alert("No hay usuario conectado");
       return;
     }
-
     (async () => {
       try {
         let { status } = await Location.requestForegroundPermissionsAsync();
@@ -91,7 +88,6 @@ const MapScreen = () => {
           Alert.alert("Permiso para acceder a la ubicación denegado");
           return;
         }
-
         let { status: bgStatus } =
           await Location.requestBackgroundPermissionsAsync();
         if (bgStatus !== "granted") {
@@ -106,8 +102,8 @@ const MapScreen = () => {
         });
         setLocation(ubicacionInicial);
         setInitialRegion({
-          latitude: ubicacionInicial.coords.latitude,
-          longitude: ubicacionInicial.coords.longitude,
+          latitude: ubicacionInicial.coords?.latitude,
+          longitude: ubicacionInicial.coords?.longitude,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         });
@@ -116,7 +112,6 @@ const MapScreen = () => {
         await setDoc(
           doc(db, "locations", userId),
           {
-            userId,
             coords: ubicacionInicial.coords,
             timestamp: new Date(),
           },
@@ -138,12 +133,9 @@ const MapScreen = () => {
   }, []);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(doc(db, "locations", userId), (doc) => {
-      if (doc.exists) {
-        const nuevaUbicacion = doc.data();
-        setLocation(nuevaUbicacion);
-        setLocations([nuevaUbicacion]);
-      }
+    const unsubscribe = onSnapshot(collection(db, "locations"), (snapshot) => {
+      const locations = snapshot.docs.map((doc) => doc.data());
+      setLocations(locations);
     });
 
     return () => unsubscribe();
@@ -158,7 +150,6 @@ const MapScreen = () => {
       await setDoc(
         doc(db, "locations", userId),
         {
-          userId,
           coords: nuevaUbicacion.coords,
           timestamp: new Date(),
         },
@@ -166,7 +157,12 @@ const MapScreen = () => {
       );
 
       setLocation(nuevaUbicacion);
-      setLocations([nuevaUbicacion]);
+      setLocations((prevLocations) => {
+        const newLocations = prevLocations.filter(
+          (loc) => loc.userId !== userId
+        );
+        return [...newLocations, { ...nuevaUbicacion, userId }];
+      });
     } catch (error) {
       console.error("Error actualizando la ubicación manualmente: ", error);
     }
@@ -196,17 +192,17 @@ const MapScreen = () => {
             <Marker
               key={index}
               coordinate={{
-                latitude: loc.coords.latitude,
-                longitude: loc.coords.longitude,
+                latitude: loc.coords?.latitude,
+                longitude: loc.coords?.longitude,
               }}
-              title={`Usuario: ${loc.userId}`}
+              title={`Usuario: ${loc.userId} + "email" + ${loc.email}`}
             />
           ))}
           {locations.length >= 3 && (
             <Polygon
               coordinates={locations.map((loc) => ({
-                latitude: loc.coords.latitude,
-                longitude: loc.coords.longitude,
+                latitude: loc.coords?.latitude,
+                longitude: loc.coords?.longitude,
               }))}
               fillColor="rgba(0, 200, 0, 0.5)"
               strokeColor="rgba(0,0,0,0.5)"

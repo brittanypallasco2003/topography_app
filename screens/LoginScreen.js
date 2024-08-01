@@ -19,31 +19,32 @@ const LoginScreen = () => {
 
   const theme = useTheme();
   const handleLogin = async () => {
-   
-      try {
-        const userCredential = await signInWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
-        const user = userCredential.user;
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
 
-        // Obtener el rol del usuario desde Firestore
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          if (userData.role === "admin" ) {
-            navigation.navigate("AdminStack");
-          } else {
-            navigation.navigate("Home");
-          }
-        } else {
-          Alert.alert("No user data found");
+      console.log(user.uid);
+      // Obtener el rol del usuario desde Firestore
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      console.log(userDoc);
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        if (userData.role === "admin") {
+          navigation.navigate("AdminStack");
+        } else if (userData.role === "usuario") {
+          navigation.navigate("Home");
         }
-      } catch (error) {
-        Alert.alert("Login Failed", error.message);
-      }finally{
-        setloading(false)
+      } else {
+        Alert.alert("No user data found");
+      }
+    } catch (error) {
+      Alert.alert("Login Failed", error.message);
+    } finally {
+      setloading(false);
     }
   };
 
@@ -56,7 +57,7 @@ const LoginScreen = () => {
       <View style={{ paddingHorizontal: 20 }}>
         <Text style={styles.title}>Topography App</Text>
         <Avatar.Icon icon={"map-search"} size={300} />
-        <Loading loading={loading}/>
+        <Loading loading={loading} />
         <TextInput
           mode="outlined"
           contentStyle={styles.input}
