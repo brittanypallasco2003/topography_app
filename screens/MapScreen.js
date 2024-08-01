@@ -134,8 +134,15 @@ const MapScreen = () => {
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "locations"), (snapshot) => {
-      const locations = snapshot.docs.map((doc) => doc.data());
-      setLocations(locations);
+      const now = new Date();
+      const recentLocations = snapshot.docs
+        .map((doc) => doc.data())
+        .filter((loc) => {
+          const lastUpdate = loc.timestamp.toDate(); // Convertir timestamp a objeto Date
+          const diffInMinutes = (now - lastUpdate) / (1000 * 60); // Diferencia en minutos
+          return diffInMinutes <= 5; // Ajusta el tiempo según sea necesario
+        });
+      setLocations(recentLocations);
     });
 
     return () => unsubscribe();
@@ -151,7 +158,7 @@ const MapScreen = () => {
         doc(db, "locations", userId),
         {
           coords: nuevaUbicacion.coords,
-          timestamp: new Date(),
+          timestamp: new Date(), // Marca de tiempo de la última actualización
         },
         { merge: true }
       );
@@ -184,20 +191,39 @@ const MapScreen = () => {
     );
   }
 
+  const colors = [
+    "red",
+    "blue",
+    "green",
+    "purple",
+    "orange",
+    "pink",
+    "cyan",
+    "magenta",
+    "yellow",
+    "grey",
+  ];
+
   return (
     <View style={styles.container}>
       {initialRegion && (
         <MapView style={styles.map} initialRegion={initialRegion}>
-          {locations.map((loc, index) => (
-            <Marker
-              key={index}
-              coordinate={{
-                latitude: loc.coords?.latitude,
-                longitude: loc.coords?.longitude,
-              }}
-              title={`Usuario: ${loc.userId} + "email" + ${loc.email}`}
-            />
-          ))}
+          {locations.map((loc, index) => {
+            // Asigna un color basado en el índice del marcador
+            const color = colors[index % colors.length]; // Usa módulo para repetir colores si hay más marcadores que colores
+
+            return (
+              <Marker
+                key={index}
+                coordinate={{
+                  latitude: loc.coords?.latitude,
+                  longitude: loc.coords?.longitude,
+                }}
+                pinColor={color} // Asigna el color al marcador
+                title={`Usuario: ${loc.userId} Email: ${loc.email}`}
+              />
+            );
+          })}
           {locations.length >= 3 && (
             <Polygon
               coordinates={locations.map((loc) => ({
