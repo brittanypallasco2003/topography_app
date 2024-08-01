@@ -1,38 +1,47 @@
-import React, { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, Alert } from 'react-native';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth, db } from '../utils/firebaseConfig';
-import { useNavigation } from '@react-navigation/native';
-import { doc, setDoc } from 'firebase/firestore';
-import RNPickerSelect from 'react-native-picker-select';
+import React, { useState } from "react";
+import { View, TextInput, Text, StyleSheet, Alert } from "react-native";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from "../utils/firebaseConfig";
+import { useNavigation } from "@react-navigation/native";
+import { doc, setDoc } from "firebase/firestore";
+import { Button, Divider, Menu } from "react-native-paper";
 
 const RegisterScreen = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState('user'); 
-  const navigation = useNavigation(); 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [role, setRole] = useState("user");
+  const [visible, setVisible] = React.useState(false);
+
+  const openMenu = () => setVisible(true);
+
+  const closeMenu = () => setVisible(false);
+  const navigation = useNavigation();
 
   const handleRegister = async () => {
     if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+      Alert.alert("Error", "Passwords do not match");
       return;
     }
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = userCredential.user;
 
       // Guardar el rol del usuario en Firestore
-      await setDoc(doc(db, 'users', user.uid), {
+      await setDoc(doc(db, "users", user.uid), {
         email: user.email,
         role: role,
       });
 
-      Alert.alert('Registration Successful');
-      navigation.navigate("Home")
+      Alert.alert("Registration Successful");
+      navigation.navigate("Home");
     } catch (error) {
-      Alert.alert('Registration Failed', error.message);
+      Alert.alert("Registration Failed", error.message);
     }
   };
 
@@ -60,16 +69,47 @@ const RegisterScreen = () => {
         onChangeText={setConfirmPassword}
         secureTextEntry
       />
-      <RNPickerSelect
-        onValueChange={(value) => setRole(value)}
-        items={[
-          { label: 'usuario', value: 'usuario' },
-          { label: 'Administrador', value: 'administrador' },
-        ]}
-        value={role}
-        placeholder={{ label: "Seleccione el rol", value: null }}
-      />
-      <Button title="Register" onPress={handleRegister} />
+      <View
+      style={{
+        paddingTop:30,
+        paddingBottom: 50,
+        flexDirection: 'row',
+        justifyContent: 'center',
+      }}>
+        <Menu
+          visible={visible}
+          onDismiss={closeMenu}
+          anchor={
+            <Button mode="elevated" onPress={openMenu}>
+              Seleccionar rol
+            </Button>
+          }
+        >
+          <Menu.Item
+            onPress={() => {
+              setRole("usuario");
+              closeMenu()
+            }}
+            title="Usuario"
+          />
+          <Divider />
+          <Menu.Item
+            onPress={() => {
+              setRole("admin");
+              closeMenu()
+            }}
+            title="Administrador"
+          />
+        </Menu>
+      </View>
+      <Button
+        mode="contained"
+        onPress={() => {
+          handleRegister();
+        }}
+      >
+        Registrar Usuario
+      </Button>
     </View>
   );
 };
@@ -77,34 +117,19 @@ const RegisterScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
     paddingHorizontal: 16,
   },
   input: {
     height: 40,
-    borderColor: 'gray',
+    borderColor: "gray",
     borderWidth: 1,
     marginBottom: 12,
     paddingHorizontal: 8,
   },
-});
-
-const pickerSelectStyles = StyleSheet.create({
-  inputIOS: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 12,
-    paddingHorizontal: 8,
-    justifyContent: 'center',
-  },
-  inputAndroid: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 12,
-    paddingHorizontal: 8,
-    justifyContent: 'center',
+  optionMenu: {
+    marginLeft: "auto",
+    marginRight: "auto",
   },
 });
 
