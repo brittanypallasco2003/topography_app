@@ -7,7 +7,6 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      // "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#005FAF"
     },
@@ -15,10 +14,6 @@
       "supportsTablet": true
     },
     "android": {
-      // "adaptiveIcon": {
-      //   "foregroundImage": "./assets/adaptive-icon.png",
-      //   "backgroundColor": "#ffffff"
-      // },
       "permissions": [
         "android.permission.ACCESS_BACKGROUND_LOCATION",
         "android.permission.ACCESS_COARSE_LOCATION",
@@ -26,7 +21,7 @@
       ],
       "config": {
         "googleMaps": {
-          "apiKey": ""
+          "apiKey": "AIzaSyAuxitOIkERVmwS9HZ_Y63teBHPr-alluM"
         }
       },
       "package": "com.nohemiespinel0.topography_app"
