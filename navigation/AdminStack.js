@@ -7,12 +7,18 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AppBar from "../components/AppBar";
 
 const Stack = createNativeStackNavigator();
-const AdminStack = () => {
+const AdminStack = ({isDarkTheme,changeTheme}) => {
   return (
     <Stack.Navigator
       initialRouteName="AdminHome"
       screenOptions={{
-        header: (props) => <AppBar {...props} />,
+        header: (props) => (
+          <AppBar
+            {...props}
+            isDarkTheme={isDarkTheme}
+            changeTheme={changeTheme}
+          />
+        ),
       }}
     >
       <Stack.Screen
@@ -29,10 +35,13 @@ const AdminStack = () => {
           title: "Agregar Usuario",
         }}
       />
-      <Stack.Screen name="ListaUser" component={ListaUser} 
-      options={{
-        title:"Lista de Usuarios"
-      }}/>
+      <Stack.Screen
+        name="ListaUser"
+        component={ListaUser}
+        options={{
+          title: "Lista de Usuarios",
+        }}
+      />
     </Stack.Navigator>
   );
 };

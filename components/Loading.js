@@ -10,7 +10,7 @@ const Loading = (props) => {
     <Portal>
       <Modal
         visible={props.loading}
-        contentContainerStyle={styles.modalContainer}
+        contentContainerStyle={[styles.modalContainer,{backgroundColor:theme.colors.background}]}
       >
         <ActivityIndicator
           animating={true}
@@ -23,7 +23,6 @@ const Loading = (props) => {
 
 const styles = StyleSheet.create({
   modalContainer: {
-    backgroundColor: "#fff",
     padding: moderateScale(30),
     marginLeft: "auto",
     marginRight: "auto",

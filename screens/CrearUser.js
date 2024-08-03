@@ -4,7 +4,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../utils/firebaseConfig";
 import { useNavigation } from "@react-navigation/native";
 import { doc, setDoc } from "firebase/firestore";
-import { Button, Divider, Menu, TextInput } from "react-native-paper";
+import { Button, Divider, Menu, TextInput, useTheme } from "react-native-paper";
 import { scale } from "react-native-size-matters";
 import { SafeAreaView } from "react-native-safe-area-context";
 import axios from "axios";
@@ -16,6 +16,7 @@ const RegisterScreen = () => {
   const [name, setName] = useState("");
   const [apellido, setApellido] = useState("");
   const [telefono, setTelefono] = useState("");
+  const theme = useTheme();
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
   const navigation = useNavigation();
@@ -33,11 +34,11 @@ const RegisterScreen = () => {
 
   const sendEmail = async (to, subject, text, html) => {
     try {
-      const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
-        method: 'POST',
+      const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${process.env.EXPO_PUBLIC_SENDGRID_API_KEY}`, // Replace with your SendGrid API Key
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.EXPO_PUBLIC_SENDGRID_API_KEY}`, // Replace with your SendGrid API Key
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           personalizations: [
@@ -45,22 +46,22 @@ const RegisterScreen = () => {
               to: [{ email: to }],
             },
           ],
-          from: { email: 'davidvallejo080808@gmail.com' },
+          from: { email: "davidvallejo080808@gmail.com" },
           subject: subject,
           content: [
             {
-              type: 'text/plain',
+              type: "text/plain",
               value: text,
             },
             {
-              type: 'text/html',
+              type: "text/html",
               value: html,
             },
           ],
         }),
       });
       if (!response.ok) {
-        throw new Error('Failed to send email');
+        throw new Error("Failed to send email");
       }
       console.log("Email sent");
     } catch (error) {
@@ -89,7 +90,7 @@ const RegisterScreen = () => {
 
       await sendEmail(
         email,
-        'Welcome to our service!',
+        "Welcome to our service!",
         `Your password is ${password}`,
         `<strong>Your password is ${password}</strong>`
       );
@@ -102,7 +103,7 @@ const RegisterScreen = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor:theme.colors.background }}>
       <ScrollView
         contentContainerStyle={styles.contentScroll}
         showsVerticalScrollIndicator={false}

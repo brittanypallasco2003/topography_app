@@ -1,12 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import {
-  View,
-  StyleSheet,
-  Button,
-  Alert,
-  ActivityIndicator,
-  Text,
-} from "react-native";
+import { View, StyleSheet, Alert, Text } from "react-native";
 import MapView, { Marker, Polygon } from "react-native-maps";
 import { collection, doc, setDoc, onSnapshot } from "firebase/firestore";
 import { db, auth } from "../utils/firebaseConfig";
@@ -14,6 +7,10 @@ import * as turf from "@turf/turf";
 import * as Location from "expo-location";
 import { LocationContext } from "../context/LocationContext";
 import * as TaskManager from "expo-task-manager";
+import { ActivityIndicator, Button, useTheme } from "react-native-paper";
+import { moderateScale, scale } from "react-native-size-matters";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ThemeProvider } from "@react-navigation/native";
 
 const LOCATION_TASK_NAME = "background-location-task";
 
@@ -74,7 +71,7 @@ const MapScreen = () => {
   const [userId, setUserId] = useState(UserId());
   const [initialRegion, setInitialRegion] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const theme = useTheme();
   useEffect(() => {
     const user = auth.currentUser;
     if (user) {
@@ -189,8 +186,8 @@ const MapScreen = () => {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
+      <View style={[styles.loadingContainer,{backgroundColor:theme.colors.background}]}>
+        <ActivityIndicator size={scale(40)} />
       </View>
     );
   }
@@ -209,7 +206,7 @@ const MapScreen = () => {
   ];
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container,{backgroundColor:theme.colors.background}]}>
       {initialRegion && (
         <MapView style={styles.map} initialRegion={initialRegion}>
           {locations.map((loc, index) => {
@@ -245,8 +242,17 @@ const MapScreen = () => {
           onPress={handlePolygonPress}
         />
       )}
-      <Button title="Actualizar Ubicación" onPress={actualizarUbicacion} />
-      <Text style={styles.locationCount}>
+      <Button
+        style={{ borderRadius: moderateScale(0) }}
+        labelStyle={styles.buttonText}
+        mode="contained"
+        onPress={() => {
+          actualizarUbicacion();
+        }}
+      >
+        Actualizar Ubicación
+      </Button>
+      <Text style={[styles.locationCount, { color: theme.colors.primary }]}>
         Número de ubicaciones: {locations.length}
       </Text>
     </View>
@@ -266,9 +272,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   locationCount: {
+    fontFamily: "Poppins_500Medium",
     textAlign: "center",
     padding: 10,
-    fontSize: 16,
+    fontSize: scale(12),
+  },
+  buttonText: {
+    fontFamily: "Poppins_600SemiBold",
+    fontSize: scale(12),
   },
 });
 

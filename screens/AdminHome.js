@@ -1,12 +1,17 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
-import { Button } from "react-native-paper";
+import { Button, useTheme } from "react-native-paper";
 import MapView from "react-native-maps";
 import { scale } from "react-native-size-matters";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 
 const AdminHome = ({ navigation }) => {
+  const theme = useTheme();
   return (
-    <View style={styles.container}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
       <TouchableOpacity
         style={styles.mapContainer}
         onLongPress={() => navigation.navigate("Map")}
@@ -28,7 +33,7 @@ const AdminHome = ({ navigation }) => {
       >
         Visualizar mapa
       </Button>
-      <Text>Administrar usuarios</Text>
+      <Text style={[styles.title,{color:theme.colors.primary}]}>Administrar usuarios</Text>
       <Button
         mode="contained"
         labelStyle={styles.buttonText}
@@ -43,12 +48,14 @@ const AdminHome = ({ navigation }) => {
       >
         Eliminar usuarios
       </Button>
-      <Button mode="contained" 
-      labelStyle={styles.buttonText}
-      onPress={() => navigation.navigate("ListaUser")}>
+      <Button
+        mode="contained"
+        labelStyle={styles.buttonText}
+        onPress={() => navigation.navigate("ListaUser")}
+      >
         Desactivar usuarios
       </Button>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -67,6 +74,10 @@ const styles = StyleSheet.create({
   buttonText: {
     fontFamily: "Poppins_600SemiBold",
     fontSize: scale(12),
+  },
+  title: {
+    fontFamily: "Poppins_600SemiBold",
+    fontSize: scale(14),
   },
 });
 

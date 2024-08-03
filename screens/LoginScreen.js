@@ -53,10 +53,10 @@ const LoginScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container,{backgroundColor:theme.colors.background}]}>
       <ScrollView contentContainerStyle={styles.contentScroll}>
-        <View style={{ paddingHorizontal: moderateScale(20) }}>
-          <Text style={styles.title}>Topography App</Text>
+        <View style={{ paddingHorizontal: moderateScale(20), flex:1, justifyContent:'space-around' }}>
+          <Text style={[styles.title,{color:theme.colors.primary}]}>Topography App</Text>
           <Avatar.Icon icon={"map-search"} size={300} />
           <Loading loading={loading} />
           <TextInput
@@ -81,8 +81,6 @@ const LoginScreen = () => {
               <TextInput.Icon
                 icon={mostrarPassword ? "eye" : "eye-off"}
                 size={20}
-                iconColor="#000"
-                rippleColor={"#000"}
                 onPress={() => setmostrarPassword(!mostrarPassword)}
               />
             }
@@ -138,7 +136,7 @@ const styles = StyleSheet.create({
   },
   contentScroll: {
     flexGrow: 1,
-    justifyContent: "center",
+    justifyContent:'space-around',
   },
 });
 

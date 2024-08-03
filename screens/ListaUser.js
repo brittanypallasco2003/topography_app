@@ -3,7 +3,7 @@ import React, { useContext, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import InfoUser from "../components/InfoUser";
 import { LocationContext } from "../context/LocationContext";
-import { Searchbar } from "react-native-paper";
+import { Searchbar, useTheme } from "react-native-paper";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 
 const ListaUser = () => {
@@ -12,10 +12,10 @@ const ListaUser = () => {
   const usuariosFiltrados = userInfo.filter((user) =>
     user.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
+  const theme = useTheme();
   return (
     <>
-      <SafeAreaView style={{ flex: 1, paddingHorizontal: moderateScale(20) }}>
+      <SafeAreaView style={{ flex: 1, paddingHorizontal: moderateScale(20), backgroundColor:theme.colors.background }}>
         <Searchbar
           placeholder="Usuario..."
           inputStyle={{ fontFamily: "Poppins_500Medium", fontSize: scale(13) }}

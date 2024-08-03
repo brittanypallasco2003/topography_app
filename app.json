@@ -21,7 +21,7 @@
       ],
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyAuxitOIkERVmwS9HZ_Y63teBHPr-alluM"
+          "apiKey": ""
         }
       },
       "package": "com.nohemiespinel0.topography_app"
