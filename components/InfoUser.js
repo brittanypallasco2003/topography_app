@@ -1,11 +1,45 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Alert } from "react-native";
 import React, { useContext } from "react";
 import { moderateScale, scale } from "react-native-size-matters";
 import { IconButton, List, useTheme } from "react-native-paper";
+import { useNavigation } from "@react-navigation/native";
+import { LocationContext } from "../context/LocationContext";
 
 const InfoUser = ({ item }) => {
   const theme = useTheme();
-  const { email, role } = item;
+  const { email, role, key } = item;
+  const navigation = useNavigation();
+  const { deleteUser } = useContext(LocationContext);
+
+  const handleDelete = () => {
+    Alert.alert(
+      "Confirmar Eliminación",
+      "¿Estás seguro de que deseas eliminar este usuario?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Eliminar",
+          onPress: async () => {
+            try {
+              await deleteUser(key);
+              Alert.alert(
+                "Eliminación exitosa",
+                `El usuario ${email} fue eliminado`
+              );
+              navigation.navigate("AdminHome");
+            } catch (error) {
+              Alert.alert("Eliminación fallida", error.message);
+            }
+          },
+          style: "destructive",
+        },
+      ],
+      { cancelable: false }
+    );
+  };
 
   return (
     <>
@@ -21,15 +55,15 @@ const InfoUser = ({ item }) => {
               <IconButton
                 icon="delete"
                 iconColor={theme.colors.error}
-                size={scale(18)}
-                onPress={() => {}}
+                size={scale(20)}
+                onPress={handleDelete}
               />
-              {/* <IconButton  //te dejo esto por si quieres poner mejor una sola vista para eliminar y desactivar usuarios
+              <IconButton
                 icon="account-off"
                 iconColor={theme.colors.primary}
-                size={scale(18)}
+                size={scale(20)}
                 onPress={() => {}}
-              /> */}
+              />
             </>
           )}
         />
