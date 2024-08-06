@@ -5,7 +5,6 @@ import MapView from "react-native-maps";
 import { scale } from "react-native-size-matters";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-
 const AdminHome = ({ navigation }) => {
   const theme = useTheme();
   return (
@@ -29,13 +28,26 @@ const AdminHome = ({ navigation }) => {
       <Button
         mode="contained"
         labelStyle={styles.buttonText}
+        style={styles.buttonStyle}
         onPress={() => navigation.navigate("Map")}
       >
         Visualizar mapa
       </Button>
-      <Text style={[styles.title,{color:theme.colors.primary}]}>Administrar usuarios</Text>
+      <Text
+        style={[
+          styles.title,
+          {
+            color: theme.colors.primary,
+            marginVertical: 9,
+            justifyContent: "center",
+          },
+        ]}
+      >
+        Administrar usuarios
+      </Text>
       <Button
         mode="contained"
+        style={styles.buttonStyle}
         labelStyle={styles.buttonText}
         onPress={() => navigation.navigate("CrearUser")}
       >
@@ -43,6 +55,7 @@ const AdminHome = ({ navigation }) => {
       </Button>
       <Button
         mode="contained"
+        style={styles.buttonStyle}
         labelStyle={styles.buttonText}
         onPress={() => navigation.navigate("ListaUser")}
       >
@@ -50,6 +63,7 @@ const AdminHome = ({ navigation }) => {
       </Button>
       <Button
         mode="contained"
+        style={styles.buttonStyle}
         labelStyle={styles.buttonText}
         onPress={() => navigation.navigate("ListaUser")}
       >
@@ -62,14 +76,18 @@ const AdminHome = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    paddingHorizontal: 30,
   },
   mapContainer: {
-    height: 200,
-    marginBottom: 16,
+    height: 300,
+    marginBottom: 15,
   },
   map: {
     ...StyleSheet.absoluteFillObject,
+  },
+  buttonStyle: {
+    marginVertical: 9,
+    padding: 7,
   },
   buttonText: {
     fontFamily: "Poppins_600SemiBold",
@@ -77,7 +95,9 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: scale(14),
+    fontSize: scale(15),
+    textAlign: "center",
+    marginTop: 30,
   },
 });
 
