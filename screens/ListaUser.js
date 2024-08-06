@@ -3,22 +3,21 @@ import React, { useContext, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import InfoUser from "../components/InfoUser";
 import { LocationContext } from "../context/LocationContext";
-import { Searchbar, useTheme } from "react-native-paper";
+import { Button, Searchbar, useTheme } from "react-native-paper";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 
 const ListaUser = () => {
   const { userInfo, setuserInfo } = useContext(LocationContext);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showInactive, setShowInactive] = useState(false);
 
   const usuariosFiltrados = userInfo
     .filter((user) =>
       user.email.toLowerCase().includes(searchQuery.toLowerCase())
     )
-    .sort((a, b) => {
-      if (a.active === false && b.active !== false) return 1;
-      if (a.active !== false && b.active === false) return -1;
-      return 0;
-    });
+    .filter((user) =>
+      showInactive ? user.active === false : user.active !== false
+    );
 
   const theme = useTheme();
   return (
@@ -36,6 +35,27 @@ const ListaUser = () => {
           onChangeText={setSearchQuery}
           value={searchQuery}
         />
+        <View
+          style={{
+            flexDirection: "row",
+            marginVertical: moderateScale(10),
+            justifyContent: "center"
+          }}
+        >
+          <Button
+            mode={showInactive ? "outlined" : "contained"}
+            onPress={() => setShowInactive(false)}
+          >
+            Activos
+          </Button>
+          <Button
+            mode={showInactive ? "contained" : "outlined"}
+            onPress={() => setShowInactive(true)}
+            style={{ marginLeft: moderateScale(10) }}
+          >
+            Inactivos
+          </Button>
+        </View>
         <FlatList
           data={usuariosFiltrados}
           renderItem={({ item }) => {
