@@ -9,6 +9,7 @@ import { moderateScale, scale } from "react-native-size-matters";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import Loading from "../components/Loading";
+import { center } from "@turf/turf";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
@@ -53,11 +54,25 @@ const LoginScreen = () => {
   };
 
   return (
-    <SafeAreaView style={[styles.container,{backgroundColor:theme.colors.background}]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
       <ScrollView contentContainerStyle={styles.contentScroll}>
-        <View style={{ paddingHorizontal: moderateScale(20), flex:1, justifyContent:'space-around' }}>
-          <Text style={[styles.title,{color:theme.colors.primary}]}>Topography App</Text>
-          <Avatar.Icon icon={"map-search"} size={300} />
+        <View>
+          <Text
+            style={[
+              styles.title,
+              { color: theme.colors.primary },
+              { marginBottom: 5 },
+            ]}
+          >
+            Topography App
+          </Text>
+          <Avatar.Icon
+            icon={"map-search"}
+            size={300}
+            style={styles.marginVer}
+          />
           <Loading loading={loading} />
           <TextInput
             mode="outlined"
@@ -69,8 +84,10 @@ const LoginScreen = () => {
             }}
             keyboardType="email-address"
             autoCapitalize="none"
+            style={styles.marginVer}
           />
           <TextInput
+            style={styles.marginVer}
             contentStyle={styles.input}
             secureTextEntry={!mostrarPassword}
             placeholder="Contraseña"
@@ -86,6 +103,7 @@ const LoginScreen = () => {
             }
           />
           <Button
+            style={[styles.marginVer, { padding: 7 }]}
             labelStyle={styles.buttonText}
             mode="elevated"
             textColor="#fff"
@@ -97,7 +115,8 @@ const LoginScreen = () => {
           >
             Iniciar Sesión
           </Button>
-          <Button
+          {/* <Button
+            style={[styles.marginVer, { padding: 7 }]}
             textColor="#fff"
             buttonColor={theme.colors.primary}
             mode="elevated"
@@ -106,7 +125,7 @@ const LoginScreen = () => {
             }}
           >
             Registro
-          </Button>
+          </Button> */}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -121,6 +140,8 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   image: {
     height: 100,
@@ -136,7 +157,10 @@ const styles = StyleSheet.create({
   },
   contentScroll: {
     flexGrow: 1,
-    justifyContent:'space-around',
+    justifyContent: "center",
+  },
+  marginVer: {
+    marginVertical: 9,
   },
 });
 
