@@ -103,7 +103,7 @@ const RegisterScreen = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor:theme.colors.background }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <ScrollView
         contentContainerStyle={styles.contentScroll}
         showsVerticalScrollIndicator={false}
@@ -111,6 +111,7 @@ const RegisterScreen = () => {
         <View style={styles.container}>
           <TextInput
             mode="outlined"
+            style={{ marginVertical: 9 }}
             contentStyle={styles.input}
             placeholder="Nombre"
             value={name}
@@ -118,6 +119,7 @@ const RegisterScreen = () => {
           />
           <TextInput
             mode="outlined"
+            style={{ marginVertical: 9 }}
             contentStyle={styles.input}
             placeholder="Apellido"
             value={apellido}
@@ -125,6 +127,7 @@ const RegisterScreen = () => {
           />
           <TextInput
             mode="outlined"
+            style={{ marginVertical: 9 }}
             contentStyle={styles.input}
             placeholder="Número de teléfono"
             value={telefono}
@@ -132,6 +135,7 @@ const RegisterScreen = () => {
           />
           <TextInput
             mode="outlined"
+            style={{ marginVertical: 9 }}
             contentStyle={styles.input}
             placeholder="Correo Electrónico"
             value={email}
@@ -151,12 +155,17 @@ const RegisterScreen = () => {
               visible={visible}
               onDismiss={closeMenu}
               anchor={
-                <Button mode="elevated" onPress={openMenu}>
+                <Button
+                  mode="elevated"
+                  onPress={openMenu}
+                  style={{ padding: 7 }}
+                >
                   Seleccionar rol
                 </Button>
               }
             >
               <Menu.Item
+                style={{ paddingHorizontal: 25 }}
                 onPress={() => {
                   setRole("usuario");
                   closeMenu();
@@ -165,6 +174,7 @@ const RegisterScreen = () => {
               />
               <Divider />
               <Menu.Item
+                style={{ paddingHorizontal: 25 }}
                 onPress={() => {
                   setRole("admin");
                   closeMenu();
@@ -173,7 +183,11 @@ const RegisterScreen = () => {
               />
             </Menu>
           </View>
-          <Button mode="contained" onPress={handleRegister}>
+          <Button
+            mode="contained"
+            onPress={handleRegister}
+            style={styles.buttonStyle}
+          >
             Registrar Usuario
           </Button>
         </View>
@@ -186,7 +200,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    paddingHorizontal: 16,
+    paddingHorizontal: 30,
   },
   input: {
     fontFamily: "Poppins_500Medium",
@@ -199,6 +213,10 @@ const styles = StyleSheet.create({
   contentScroll: {
     flexGrow: 1,
     justifyContent: "center",
+  },
+  buttonStyle: {
+    marginVertical: 9,
+    padding: 7,
   },
 });
 
