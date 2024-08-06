@@ -1,6 +1,12 @@
 import React, { createContext, useEffect, useState } from "react";
 import { db } from "../utils/firebaseConfig";
-import { collection, onSnapshot, doc, deleteDoc } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  doc,
+  deleteDoc,
+  updateDoc,
+} from "firebase/firestore";
 
 export const LocationContext = createContext();
 
@@ -28,11 +34,16 @@ export const LocationProvider = ({ children }) => {
   const deleteUser = async (userId) => {
     try {
       await deleteDoc(doc(db, "users", userId));
-      setuserInfo((prevUsers) =>
-        prevUsers.filter((user) => user.key !== userId)
-      );
     } catch (error) {
       console.error("Error deleting user: ", error);
+    }
+  };
+
+  const deactivateUser = async (userId) => {
+    try {
+      await updateDoc(doc(db, "users", userId), { active: false });
+    } catch (error) {
+      console.error("Error deactivating user: ", error);
     }
   };
 
@@ -46,6 +57,7 @@ export const LocationProvider = ({ children }) => {
         userInfo,
         setuserInfo,
         deleteUser,
+        deactivateUser,
       }}
     >
       {children}

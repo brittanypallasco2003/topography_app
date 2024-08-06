@@ -9,12 +9,12 @@ const InfoUser = ({ item }) => {
   const theme = useTheme();
   const { email, role, key } = item;
   const navigation = useNavigation();
-  const { deleteUser } = useContext(LocationContext);
+  const { deleteUser, deactivateUser } = useContext(LocationContext);
 
   const handleDelete = () => {
     Alert.alert(
       "Confirmar Eliminación",
-      "¿Estás seguro de que deseas eliminar este usuario?",
+      "¿Estás seguro de eliminar este usuario?",
       [
         {
           text: "Cancelar",
@@ -32,6 +32,36 @@ const InfoUser = ({ item }) => {
               navigation.navigate("AdminHome");
             } catch (error) {
               Alert.alert("Eliminación fallida", error.message);
+            }
+          },
+          style: "destructive",
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
+  const handleDeactivate = () => {
+    Alert.alert(
+      "Confirmar Desactivación",
+      "¿Estás seguro de desactivar este usuario?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Desactivar",
+          onPress: async () => {
+            try {
+              await deactivateUser(key);
+              Alert.alert(
+                "Desactivación exitosa",
+                `El usuario ${email} fue desactivado`
+              );
+              navigation.navigate("AdminHome");
+            } catch (error) {
+              Alert.alert("Desactivación fallida", error.message);
             }
           },
           style: "destructive",
@@ -62,7 +92,7 @@ const InfoUser = ({ item }) => {
                 icon="account-off"
                 iconColor={theme.colors.primary}
                 size={scale(20)}
-                onPress={() => {}}
+                onPress={handleDeactivate}
               />
             </>
           )}
