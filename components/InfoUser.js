@@ -1,15 +1,16 @@
 import { View, Text, StyleSheet, Alert } from "react-native";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { moderateScale, scale } from "react-native-size-matters";
 import { IconButton, List, useTheme } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { LocationContext } from "../context/LocationContext";
+import Loading from "./Loading";
 
 const InfoUser = ({ item }) => {
   const theme = useTheme();
-  const { email, role, key } = item;
-  const navigation = useNavigation();
+  const { email, role, key, active } = item;
   const { deleteUser, deactivateUser } = useContext(LocationContext);
+  const [loading, setloading] = useState(false);
 
   const handleDelete = () => {
     Alert.alert(
@@ -23,15 +24,17 @@ const InfoUser = ({ item }) => {
         {
           text: "Eliminar",
           onPress: async () => {
+            setloading(true);
             try {
               await deleteUser(key);
               Alert.alert(
                 "Eliminación exitosa",
                 `El usuario ${email} fue eliminado`
               );
-              navigation.navigate("AdminHome");
             } catch (error) {
               Alert.alert("Eliminación fallida", error.message);
+            } finally {
+              setloading(false);
             }
           },
           style: "destructive",
@@ -53,15 +56,17 @@ const InfoUser = ({ item }) => {
         {
           text: "Desactivar",
           onPress: async () => {
+            setloading(true);
             try {
               await deactivateUser(key);
               Alert.alert(
                 "Desactivación exitosa",
                 `El usuario ${email} fue desactivado`
               );
-              navigation.navigate("AdminHome");
             } catch (error) {
               Alert.alert("Desactivación fallida", error.message);
+            } finally {
+              setloading(false);
             }
           },
           style: "destructive",
@@ -74,12 +79,22 @@ const InfoUser = ({ item }) => {
   return (
     <>
       <List.Section>
+        <Loading loading={loading} />
         <List.Item
           title={`${email}`}
-          description={`${role}`}
-          style={{ borderBottomWidth: moderateScale(1) }}
-          titleStyle={style.titleStListItem}
-          descriptionStyle={style.descripListItem}
+          description={active === false ? "Usuario desactivado" : `${role}`}
+          style={[
+            { borderBottomWidth: moderateScale(1) },
+            active === false && style.inactiveUser,
+          ]}
+          titleStyle={[
+            style.titleStListItem,
+            active === false && style.inactiveTitle,
+          ]}
+          descriptionStyle={[
+            style.descripListItem,
+            active === false && style.inactiveDescription,
+          ]}
           right={() => (
             <>
               <IconButton
@@ -88,12 +103,14 @@ const InfoUser = ({ item }) => {
                 size={scale(20)}
                 onPress={handleDelete}
               />
-              <IconButton
-                icon="account-off"
-                iconColor={theme.colors.primary}
-                size={scale(20)}
-                onPress={handleDeactivate}
-              />
+              {active != false && (
+                <IconButton
+                  icon="account-off"
+                  iconColor={theme.colors.primary}
+                  size={scale(20)}
+                  onPress={handleDeactivate}
+                />
+              )}
             </>
           )}
         />
@@ -110,6 +127,15 @@ const style = StyleSheet.create({
   descripListItem: {
     fontFamily: "Poppins_500Medium",
     fontSize: scale(11),
+  },
+  inactiveUser: {
+    backgroundColor: "#F0F0F0",
+  },
+  inactiveTitle: {
+    color: "#8E8E8E",
+  },
+  inactiveDescription: {
+    color: "#DC7D7E",
   },
 });
 

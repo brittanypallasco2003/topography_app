@@ -59,16 +59,16 @@ const AdminHome = ({ navigation }) => {
         labelStyle={styles.buttonText}
         onPress={() => navigation.navigate("ListaUser")}
       >
-        Eliminar usuarios
+        Eliminar y desactivar usuarios
       </Button>
-      <Button
+      {/* <Button
         mode="contained"
         style={styles.buttonStyle}
         labelStyle={styles.buttonText}
         onPress={() => navigation.navigate("ListaUser")}
       >
         Desactivar usuarios
-      </Button>
+      </Button> */}
     </SafeAreaView>
   );
 };

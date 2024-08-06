@@ -9,13 +9,27 @@ import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 const ListaUser = () => {
   const { userInfo, setuserInfo } = useContext(LocationContext);
   const [searchQuery, setSearchQuery] = useState("");
-  const usuariosFiltrados = userInfo.filter((user) =>
-    user.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+
+  const usuariosFiltrados = userInfo
+    .filter((user) =>
+      user.email.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => {
+      if (a.active === false && b.active !== false) return 1;
+      if (a.active !== false && b.active === false) return -1;
+      return 0;
+    });
+
   const theme = useTheme();
   return (
     <>
-      <SafeAreaView style={{ flex: 1, paddingHorizontal: moderateScale(20), backgroundColor:theme.colors.background }}>
+      <SafeAreaView
+        style={{
+          flex: 1,
+          paddingHorizontal: moderateScale(20),
+          backgroundColor: theme.colors.background,
+        }}
+      >
         <Searchbar
           placeholder="Usuario..."
           inputStyle={{ fontFamily: "Poppins_500Medium", fontSize: scale(13) }}
