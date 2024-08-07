@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { View, Text, StyleSheet, Alert, ScrollView } from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../utils/firebaseConfig";
@@ -10,6 +10,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import Loading from "../components/Loading";
 import { center } from "@turf/turf";
+import { LocationContext } from "../context/LocationContext";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
@@ -17,7 +18,8 @@ const LoginScreen = () => {
   const [mostrarPassword, setmostrarPassword] = useState(false);
   const [loading, setloading] = useState(false);
   const navigation = useNavigation();
-
+  const { setcerrarSesionAdmin, setcerrarSesionUser } =
+    useContext(LocationContext);
   const theme = useTheme();
   const handleLogin = async () => {
     try {
@@ -35,9 +37,11 @@ const LoginScreen = () => {
       if (userDoc.exists()) {
         const userData = userDoc.data();
         if (userData.role === "admin") {
+          setcerrarSesionAdmin(true)
           navigation.navigate("AdminStack");
         } else if (userData.role === "usuario") {
-          navigation.navigate("Home");
+          setcerrarSesionUser(true)
+          navigation.navigate("Map");
         }
       } else {
         Alert.alert("No user data found");
@@ -49,15 +53,15 @@ const LoginScreen = () => {
     }
   };
 
-  const handleNavigateToRegister = () => {
-    navigation.navigate("Register");
-  };
 
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: theme.colors.background }]}
     >
-      <ScrollView contentContainerStyle={styles.contentScroll}>
+      <ScrollView
+        contentContainerStyle={styles.contentScroll}
+        showsVerticalScrollIndicator={false}
+      >
         <View>
           <Text
             style={[
@@ -70,7 +74,7 @@ const LoginScreen = () => {
           </Text>
           <Avatar.Icon
             icon={"map-search"}
-            size={300}
+            size={285}
             style={styles.marginVer}
           />
           <Loading loading={loading} />

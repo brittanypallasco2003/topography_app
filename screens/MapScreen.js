@@ -19,7 +19,6 @@ const UserId = () => {
   if (user && user.uid) {
     return user.uid;
   } else {
-    Alert.alert("No hay usuario conectado");
     return null;
   }
 };
@@ -77,7 +76,6 @@ const MapScreen = () => {
     if (user) {
       setUserId(user.uid);
     } else {
-      Alert.alert("No hay usuario conectado");
       return;
     }
     (async () => {

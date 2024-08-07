@@ -45,10 +45,14 @@ const ListaUser = () => {
           <Button
             mode={showInactive ? "outlined" : "contained"}
             onPress={() => setShowInactive(false)}
+            labelStyle={{fontFamily: "Poppins_500Medium",
+              fontSize: scale(12),}}
           >
             Activos
           </Button>
           <Button
+          labelStyle={{fontFamily: "Poppins_500Medium",
+            fontSize: scale(12),}}
             mode={showInactive ? "contained" : "outlined"}
             onPress={() => setShowInactive(true)}
             style={{ marginLeft: moderateScale(10) }}

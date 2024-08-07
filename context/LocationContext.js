@@ -14,6 +14,8 @@ export const LocationProvider = ({ children }) => {
   const [location, setLocation] = useState(null);
   const [locations, setLocations] = useState([]);
   const [userInfo, setuserInfo] = useState([]);
+  const [cerrarSesionUser, setcerrarSesionUser] = useState(false)
+  const [cerrarSesionAdmin, setcerrarSesionAdmin] = useState(false)
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "users"), (querySnapshot) => {
@@ -58,6 +60,10 @@ export const LocationProvider = ({ children }) => {
         setuserInfo,
         deleteUser,
         deactivateUser,
+        cerrarSesionUser,
+        setcerrarSesionUser,
+        cerrarSesionAdmin,
+        setcerrarSesionAdmin
       }}
     >
       {children}

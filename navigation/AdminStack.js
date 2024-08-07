@@ -11,15 +11,16 @@ const AdminStack = ({isDarkTheme,changeTheme}) => {
   return (
     <Stack.Navigator
       initialRouteName="AdminHome"
-      screenOptions={{
+      screenOptions={({ route }) => ({
         header: (props) => (
           <AppBar
             {...props}
             isDarkTheme={isDarkTheme}
             changeTheme={changeTheme}
+            isHomeAdmin={route.name === "AdminHome"}
           />
         ),
-      }}
+      })}
     >
       <Stack.Screen
         name="AdminHome"

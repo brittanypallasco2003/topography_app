@@ -8,6 +8,7 @@ import { Button, Divider, Menu, TextInput, useTheme } from "react-native-paper";
 import { scale } from "react-native-size-matters";
 import { SafeAreaView } from "react-native-safe-area-context";
 import axios from "axios";
+import Loading from "../components/Loading";
 
 const RegisterScreen = () => {
   const [email, setEmail] = useState("");
@@ -16,6 +17,7 @@ const RegisterScreen = () => {
   const [name, setName] = useState("");
   const [apellido, setApellido] = useState("");
   const [telefono, setTelefono] = useState("");
+  const [loading, setloading] = useState(false)
   const theme = useTheme();
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
@@ -70,6 +72,7 @@ const RegisterScreen = () => {
   };
 
   const handleRegister = async () => {
+    setloading(true)
     const password = generatePassword();
 
     try {
@@ -96,9 +99,11 @@ const RegisterScreen = () => {
       );
 
       Alert.alert("Registration Successful");
-      navigation.navigate("Home");
+      navigation.navigate("AdminHome");
     } catch (error) {
       Alert.alert("Registration Failed", error.message);
+    }finally{
+      setloading(false)
     }
   };
 
@@ -109,6 +114,7 @@ const RegisterScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.container}>
+        <Loading loading={loading} />
           <TextInput
             mode="outlined"
             style={{ marginVertical: 9 }}
@@ -156,6 +162,7 @@ const RegisterScreen = () => {
               onDismiss={closeMenu}
               anchor={
                 <Button
+                  labelStyle={styles.butonText}
                   mode="elevated"
                   onPress={openMenu}
                   style={{ padding: 7 }}
@@ -165,6 +172,7 @@ const RegisterScreen = () => {
               }
             >
               <Menu.Item
+                titleStyle={styles.menuText}
                 style={{ paddingHorizontal: 25 }}
                 onPress={() => {
                   setRole("usuario");
@@ -174,6 +182,7 @@ const RegisterScreen = () => {
               />
               <Divider />
               <Menu.Item
+              titleStyle={styles.menuText}
                 style={{ paddingHorizontal: 25 }}
                 onPress={() => {
                   setRole("admin");
@@ -184,6 +193,7 @@ const RegisterScreen = () => {
             </Menu>
           </View>
           <Button
+            labelStyle={styles.butonText}
             mode="contained"
             onPress={handleRegister}
             style={styles.buttonStyle}
@@ -217,6 +227,14 @@ const styles = StyleSheet.create({
   buttonStyle: {
     marginVertical: 9,
     padding: 7,
+  },
+  butonText: {
+    fontFamily: "Poppins_600SemiBold",
+    fontSize: scale(12),
+  },
+  menuText: {
+    fontFamily: "Poppins_500Medium",
+    fontSize: scale(12),
   },
 });
 
