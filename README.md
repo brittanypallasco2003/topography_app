@@ -85,3 +85,5 @@ El presente repositorio tiene como solución que permita trackear en tiempo real
 ## Manual de Usuario 📽️
 
 [Video de youtube](https://www.youtube.com)
+
+## Capturas de Aplicación
