@@ -15,6 +15,7 @@ El presente repositorio tiene como solución que permita trackear en tiempo real
 2. [Aplicación Construida](#)
 3. [Manual de Instalación](#)
 4. [Manual de Usuario](#)
+5. [Capturas de la Aplicacion](#)
 
 ## Admin - Usuarios
 
