@@ -22,7 +22,7 @@ El presente repositorio tiene como solución que permita trackear en tiempo real
 | Rol     | Funciones |
 |---------|-----------|
 | Admin  | - Iniciar y cerrar sesión<br>- Desactivar Usuarios<br>- Eliminar Usuarios<br>- Generar Nuevo Usuario<br>- Asignar Roles<br>- Visualizar su ubicación en el mapa|
-| Usuario| - Iniciar y cerrar sesión|<br>- Visualizar su ubicación en el mapa
+| Usuario| - Iniciar y cerrar sesión<br>- Visualizar su ubicación en el mapa|
 
 ## Aplicación Construida
 
