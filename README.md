@@ -89,3 +89,37 @@ El presente repositorio tiene como solución que permita trackear en tiempo real
 [Video de youtube](https://youtu.be/UsZqL9SL6Qo)
 
 ## Capturas de Aplicación
+
+### Splash Screen
+
+![image](https://github.com/user-attachments/assets/55b84ff2-8509-4501-a39a-fe1e87c755d6)
+
+### Pantalla de Home
+
+![image](https://github.com/user-attachments/assets/3efa359f-ac26-4bb0-8b71-211a155e76af)
+
+### Modo Oscuro
+
+![image](https://github.com/user-attachments/assets/5314976a-8560-41c1-abb8-42eff3cfda92)
+
+### Pantalla de Inicio
+
+![image](https://github.com/user-attachments/assets/f80f9316-6d46-4e1b-a980-adbf01435442)
+
+### Pantalla de Usuarios Activos
+
+![image](https://github.com/user-attachments/assets/f126e556-1cb0-4649-8ccf-8ddc8975e4ee)
+
+### Pantalla de Usuarios Inactivos
+
+![image](https://github.com/user-attachments/assets/00031423-3430-474a-9a84-b6b1439e5201)
+
+### Pantalla de Crear Usuario
+
+![image](https://github.com/user-attachments/assets/76cabe7c-2766-49e4-95ef-e7cb0c9af55c)
+
+### Mapa de Google Maps
+
+![image](https://github.com/user-attachments/assets/63ed83bd-898f-494c-8b0e-5da0c2d68e4b)
+
+
