@@ -19,6 +19,7 @@ const UserId = () => {
   if (user && user.uid) {
     return user.uid;
   } else {
+    Alert.alert("No hay usuario conectado");
     return null;
   }
 };
@@ -76,6 +77,7 @@ const MapScreen = () => {
     if (user) {
       setUserId(user.uid);
     } else {
+      Alert.alert("No hay usuario conectado");
       return;
     }
     (async () => {
@@ -236,9 +238,15 @@ const MapScreen = () => {
       )}
       {locations.length >= 3 && (
         <Button
-          title="Formar Polígono y Calcular Área"
-          onPress={handlePolygonPress}
-        />
+        style={{ borderRadius: moderateScale(0), }}
+        labelStyle={styles.buttonText}
+        mode="contained"
+          // title="Formar Polígono y Calcular Área"
+        onPress={handlePolygonPress}
+        >
+          Formar Polígono y Calcular Área
+        </Button>
+
       )}
       <Button
         style={{ borderRadius: moderateScale(0) }}

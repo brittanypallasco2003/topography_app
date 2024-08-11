@@ -9,7 +9,7 @@ import { moderateScale, scale } from "react-native-size-matters";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import Loading from "../components/Loading";
-import { center } from "@turf/turf";
+
 import { LocationContext } from "../context/LocationContext";
 
 const LoginScreen = () => {
