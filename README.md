@@ -26,7 +26,7 @@ El presente repositorio tiene como solución que permita trackear en tiempo real
 
 ## Aplicación Construida
 
-[Descargar .apk](TopographyApp.rar)
+[Descargar .apk](Topography_App.apk)
 
 ## Manual de Instalación
 
